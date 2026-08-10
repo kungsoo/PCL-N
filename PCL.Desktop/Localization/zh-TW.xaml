@@ -505,7 +505,6 @@
     <sys:String x:Key="Oobe.Telemetry.Essential.Items">• 請求識別、啟動器版本/通道、平台/架構、協定與 API 版本&#x0a;• 使用者主動發起的更新、下載和線上服務請求所產生的時間、狀態與網路中繼資料&#x0a;• 安全驗證結果（不含權杖）&#x0a;• 嚴重故障階段、正規化類別與不可逆指紋</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Essential.Excludes">不會上傳完整例外訊息、堆疊、操作軌跡、本機路徑、啟動參數、日誌附件、傾印、帳戶資料或驗證權杖。</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Experience.Toggle">加入「使用者體驗改進計畫」（可選）</sys:String>
-    <sys:String x:Key="Oobe.Telemetry.Experience.Intro">開啟後，Sentry 與 PostHog 會協助我們發現緩慢操作、崩潰版本和難用的工作流程。</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Experience.Items">• 功能使用次數、頁面與工作流程漏斗、Feature Flag&#x0a;• 啟動、下載、遊戲啟動、外掛載入等效能階段&#x0a;• 經清理的完整例外、堆疊與有限操作內容&#x0a;• 系統/架構/執行階段/語言及硬體分級</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Experience.Withdraw">你可隨時在「設定 → 關於與法律」退出。退出會立即停止上傳、清除待上傳資料並刪除匿名識別，不影響核心功能。</sys:String>
     <sys:String x:Key="Oobe.Finish.Title">感謝您選擇 PCL N Edition！</sys:String>
@@ -606,15 +605,6 @@
     <sys:String x:Key="Setup.About.SpecialThanks.OpenMcmod">訪問網站</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.SponsorMirror">贊助映象服務</sys:String>
     <sys:String x:Key="Setup.About.SpecialThanks.Title">特別鳴謝</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Description">感謝每一位支持 PCL N 持續開發的贊助者。閃電標記表示目前正在贊助。</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Empty">暫時沒有可顯示的贊助者。</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Error">暫時無法取得贊助者名單，感謝所有支持者。</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Loading">正在取得贊助者名單</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Retry">重新載入</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Stale">目前顯示最近一次成功取得的名單。</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Summary">感謝來自愛發電的 {0} 位贊助者，名單即時更新。</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Support">在愛發電支持我們</sys:String>
-    <sys:String x:Key="Setup.About.Sponsors.Title">贊助者</sys:String>
     <sys:String x:Key="Setup.About.SponsorCommunityAuthor">贊助開發者</sys:String>
     <sys:String x:Key="Setup.About.SponsorOriginalAuthor">贊助原作者</sys:String>
     <sys:String x:Key="Setup.About.Title">關於</sys:String>

@@ -51,23 +51,6 @@
     <PclPluginSidecarZipPath Condition="'$(PclPluginSidecarZipPath)' != ''">$([System.IO.Path]::GetFullPath('$(PclPluginSidecarZipPath)'))</PclPluginSidecarZipPath>
     <PclNativeRuntimeZipPath Condition="'$(PclNativeRuntimeZipPath)' != ''">$([System.IO.Path]::GetFullPath('$(PclNativeRuntimeZipPath)'))</PclNativeRuntimeZipPath>
 
-    <!-- CI secret pre-write (PCL_WRITE_SECRET=1 embeds values into PclEmbeddedSecrets). -->
-    <PclWriteSecret Condition="'$(PclWriteSecret)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_WRITE_SECRET'))</PclWriteSecret>
-    <PclMsClientId Condition="'$(PclMsClientId)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_MS_CLIENT_ID'))</PclMsClientId>
-    <PclMsClientId Condition="'$(PclMsClientId)' == ''">$([System.Environment]::GetEnvironmentVariable('MS_CLIENT_ID'))</PclMsClientId>
-    <PclLittleSkinClientId Condition="'$(PclLittleSkinClientId)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_LITTLESKIN_CLIENT_ID'))</PclLittleSkinClientId>
-    <PclLittleSkinClientSecret Condition="'$(PclLittleSkinClientSecret)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_LITTLESKIN_CLIENT_SECRET'))</PclLittleSkinClientSecret>
-    <PclLittleSkinRedirectUri Condition="'$(PclLittleSkinRedirectUri)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_LITTLESKIN_REDIRECT_URI'))</PclLittleSkinRedirectUri>
-    <PclCurseForgeApiKey Condition="'$(PclCurseForgeApiKey)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_CURSEFORGE_API_KEY'))</PclCurseForgeApiKey>
-    <PclSentryDsn Condition="'$(PclSentryDsn)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_SENTRY_DSN'))</PclSentryDsn>
-    <PclSentryEssentialDsn Condition="'$(PclSentryEssentialDsn)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_SENTRY_ESSENTIAL_DSN'))</PclSentryEssentialDsn>
-    <PclPostHogProjectToken Condition="'$(PclPostHogProjectToken)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_POSTHOG_PROJECT_TOKEN'))</PclPostHogProjectToken>
-    <PclPostHogHost Condition="'$(PclPostHogHost)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_POSTHOG_HOST'))</PclPostHogHost>
-    <PclNaidClientId Condition="'$(PclNaidClientId)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_NAID_CLIENT_ID'))</PclNaidClientId>
-    <PclNaidClientSecret Condition="'$(PclNaidClientSecret)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_NAID_CLIENT_SECRET'))</PclNaidClientSecret>
-    <PclLinkServerRoot Condition="'$(PclLinkServerRoot)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_LINK_SERVER_ROOT'))</PclLinkServerRoot>
-    <PclLobbyDefaultSecret Condition="'$(PclLobbyDefaultSecret)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_LOBBY_DEFAULT_SECRET'))</PclLobbyDefaultSecret>
-    <PclGithubSha Condition="'$(PclGithubSha)' == ''">$([System.Environment]::GetEnvironmentVariable('PCL_GITHUB_SHA'))</PclGithubSha>
   </PropertyGroup>
   <!--
     VideoLAN.LibVLC.Windows enables x64, x86, and ARM64 for AnyCPU projects by
@@ -104,21 +87,6 @@
     <CompilerVisibleProperty Include="SourceRevisionId" />
     <CompilerVisibleProperty Include="PclRuntimeVariant" />
     <CompilerVisibleProperty Include="PclIncludesPlugin" />
-    <CompilerVisibleProperty Include="PclWriteSecret" />
-    <CompilerVisibleProperty Include="PclMsClientId" />
-    <CompilerVisibleProperty Include="PclLittleSkinClientId" />
-    <CompilerVisibleProperty Include="PclLittleSkinClientSecret" />
-    <CompilerVisibleProperty Include="PclLittleSkinRedirectUri" />
-    <CompilerVisibleProperty Include="PclCurseForgeApiKey" />
-    <CompilerVisibleProperty Include="PclSentryDsn" />
-    <CompilerVisibleProperty Include="PclSentryEssentialDsn" />
-    <CompilerVisibleProperty Include="PclPostHogProjectToken" />
-    <CompilerVisibleProperty Include="PclPostHogHost" />
-    <CompilerVisibleProperty Include="PclNaidClientId" />
-    <CompilerVisibleProperty Include="PclNaidClientSecret" />
-    <CompilerVisibleProperty Include="PclLinkServerRoot" />
-    <CompilerVisibleProperty Include="PclLobbyDefaultSecret" />
-    <CompilerVisibleProperty Include="PclGithubSha" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.0" />
@@ -130,7 +98,6 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
-    <PackageReference Include="Sentry" Version="6.8.0" />
     <ProjectReference Include="../external/Jvm.NET/src/Jvm.NET/Jvm.NET.csproj" />
     <PackageReference Include="LibVLCSharp" Version="3.10.0" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1"
@@ -187,7 +154,6 @@
     <ProjectReference Include="../PCL.Platform/PCL.Platform.csproj" />
     <ProjectReference Include="../PCL.UI.Abstractions/PCL.UI.Abstractions.csproj" />
   </ItemGroup>
-  <Import Project="GenerateEmbeddedSecrets.targets" />
   <!--
     Source-overlay plugin inject: after scripts/apply-plugin-overlay.ps1 pulls PCL.Plugin
     and rewrites host hooks, build with -p:PclWithPlugin=true to compile plugin sources

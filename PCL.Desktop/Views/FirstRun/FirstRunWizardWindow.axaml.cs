@@ -17,7 +17,6 @@ using PCL.Desktop.Legal;
 using PCL.Desktop.Localization;
 using PCL.Desktop.Paths;
 using PCL.Desktop.Theme;
-using PCL.Desktop.Telemetry;
 
 namespace PCL.Desktop.Views.FirstRun;
 
@@ -80,7 +79,6 @@ public sealed partial class FirstRunWizardWindow : Window
     private MyButton? _btnLegalPrev;
     private MyButton? _btnLegalNext;
     private MyButton? _btnFinish;
-    private MyCheckBox? _checkExperienceProgram;
 
     private string _termsMarkdown = string.Empty;
     private string _privacyMarkdown = string.Empty;
@@ -144,7 +142,6 @@ public sealed partial class FirstRunWizardWindow : Window
         ApplyLocalizedCopy();
         LoadLegalDocuments();
         SeedPathFields();
-        SeedTelemetryChoice();
         ApplyWelcomeCopyForPlan();
 
         Opened += OnOpened;
@@ -195,7 +192,6 @@ public sealed partial class FirstRunWizardWindow : Window
         _pageLegal = this.FindControl<Grid>("PageLegal");
         _pageData = this.FindControl<Grid>("PageData");
         _pageOnline = this.FindControl<Grid>("PageOnline");
-        _pageTelemetry = this.FindControl<Grid>("PageTelemetry");
         _pageFinish = this.FindControl<Grid>("PageFinish");
         _heroIcon = this.FindControl<Image>("HeroIcon");
         _finishIcon = this.FindControl<Image>("FinishIcon");
@@ -211,7 +207,6 @@ public sealed partial class FirstRunWizardWindow : Window
         _btnLegalPrev = this.FindControl<MyButton>("BtnLegalPrev");
         _btnLegalNext = this.FindControl<MyButton>("BtnLegalNext");
         _btnFinish = this.FindControl<MyButton>("BtnFinish");
-        _checkExperienceProgram = this.FindControl<MyCheckBox>("CheckExperienceProgram");
 
         if (_heroIcon?.RenderTransform is TranslateTransform tt)
             _iconTranslate = tt;
@@ -236,8 +231,6 @@ public sealed partial class FirstRunWizardWindow : Window
             dataTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Data.Title", "启动器数据配置");
         if (this.FindControl<TextBlock>("LabOnlineTitle") is { } onlineTitle)
             onlineTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Online.Title", "在线服务配置");
-        if (this.FindControl<TextBlock>("LabTelemetryTitle") is { } telTitle)
-            telTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Telemetry.Title", "遥测与数据收集");
         if (this.FindControl<TextBlock>("LabFinishTitle") is { } finish)
             finish.Text = AvaloniaLocalizationManager.GetText("Oobe.Finish.Title", "感谢您选择 PCL N Edition！");
         if (_btnFinish is not null)
@@ -294,16 +287,6 @@ public sealed partial class FirstRunWizardWindow : Window
             _txtDataPath.Text = LauncherPathLayout.ResolveDataDirectory();
         if (_txtCachePath is not null)
             _txtCachePath.Text = LauncherPathLayout.ResolveCacheDirectory();
-    }
-
-    private void SeedTelemetryChoice()
-    {
-        if (_checkExperienceProgram is null)
-            return;
-        LauncherSettings settings = LauncherSettingsPageBinder.LoadSettings();
-        _checkExperienceProgram.Checked = settings.GetBooleanOption(
-            LauncherTelemetry.ExperienceSettingKey,
-            LauncherSettingDefaults.GetBoolean(LauncherTelemetry.ExperienceSettingKey));
     }
 
     private void PlaceWindowAtCenter(PixelPoint centerScreen)
@@ -551,12 +534,6 @@ public sealed partial class FirstRunWizardWindow : Window
                     this.FindControl<MyButton>("BtnOnlineNext"),
                     canPrev: CanGoPrevious());
                 break;
-            case OobeStepId.Telemetry:
-                ConfigureNavButtons(
-                    this.FindControl<MyButton>("BtnTelemetryPrev"),
-                    this.FindControl<MyButton>("BtnTelemetryNext"),
-                    canPrev: CanGoPrevious());
-                break;
             case OobeStepId.Finish:
                 ApplyFinishLayout();
                 break;
@@ -598,7 +575,6 @@ public sealed partial class FirstRunWizardWindow : Window
             OobeStepId.Terms or OobeStepId.Privacy => _pageLegal,
             OobeStepId.DataPaths => _pageData,
             OobeStepId.Online => _pageOnline,
-            OobeStepId.Telemetry => _pageTelemetry,
             OobeStepId.Finish => _pageFinish,
             OobeStepId.Welcome => _pageWelcome,
             _ => null
@@ -606,7 +582,7 @@ public sealed partial class FirstRunWizardWindow : Window
 
     private IEnumerable<Grid> GetStepPages()
     {
-        Grid?[] pages = [_pageWelcome, _pageLegal, _pageData, _pageOnline, _pageTelemetry, _pageFinish];
+        Grid?[] pages = [_pageWelcome, _pageLegal, _pageData, _pageOnline, _pageFinish];
         foreach (Grid? page in pages)
         {
             if (page is not null)
@@ -962,26 +938,6 @@ public sealed partial class FirstRunWizardWindow : Window
     private void BtnOnlinePrev_Click(object? sender, EventArgs e) => GoToPreviousStep(animate: true);
 
     private void BtnOnlineNext_Click(object? sender, EventArgs e) => GoToNextStep(animate: true);
-
-    private void BtnTelemetryPrev_Click(object? sender, EventArgs e) => GoToPreviousStep(animate: true);
-
-    private void BtnTelemetryNext_Click(object? sender, EventArgs e)
-    {
-        PersistTelemetryChoice();
-        GoToNextStep(animate: true);
-    }
-
-    private void PersistTelemetryChoice()
-    {
-        bool enabled = _checkExperienceProgram?.Checked == true;
-        LauncherSettingsPageBinder.UpdateSettings(current =>
-        {
-            current.SetBooleanOption(LauncherTelemetry.ExperienceSettingKey, enabled);
-            if (!enabled)
-                current.RemoveTextOption(LauncherTelemetry.AnonymousIdSettingKey);
-            return current;
-        });
-    }
 
     private void BtnFinish_Click(object? sender, EventArgs e)
     {

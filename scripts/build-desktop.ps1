@@ -5,7 +5,6 @@ param(
     [string]$Configuration = "Debug",
     [switch]$Publish,
     [string]$Runtime = "win-x64",
-    [switch]$WriteSecrets,
     # Legacy compatibility switch. Publish is always NativeAOT now.
     [switch]$Aot,
     # Compile PCL.Plugin sources into Desktop after apply-plugin-overlay.ps1 (source-overlay inject).
@@ -25,10 +24,6 @@ $env:MSBUILDDISABLENODEREUSE = "1"
 $env:DOTNET_CLI_UI_LANGUAGE = "en"
 
 $project = Join-Path $PSScriptRoot "..\PCL.Desktop\PCL.Desktop.csproj"
-
-if ($WriteSecrets) {
-    $env:PCL_WRITE_SECRET = "1"
-}
 
 # -WithPlugin embeds the CoreCLR sidecar into the NativeAOT host.
 # In-process PclWithPlugin compile-into-Desktop is no longer the product path.
@@ -91,7 +86,6 @@ if ($Publish) {
         -p:PublishSingleFile=false `
         -p:DebugType=None `
         -p:DebugSymbols=false `
-        -p:PclWriteSecret=1 `
         -p:PclPluginSidecarZipPath= `
         -p:PclNativeRuntimeZipPath= `
         -o $nativeStage
@@ -117,7 +111,6 @@ if ($Publish) {
         -p:PublishSingleFile=false `
         -p:DebugType=None `
         -p:DebugSymbols=false `
-        -p:PclWriteSecret=1 `
         @embedArgs `
         -o $outDir
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

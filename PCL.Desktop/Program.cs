@@ -52,7 +52,6 @@ internal static class Program
             SetLauncherWorkingDirectory();
 
             // Apply CI-embedded secrets (MS client id, etc.) before any auth/UI code runs.
-            PclEmbeddedSecrets.ApplyToEnvironment();
 
             // pcln-paths.json is the durable marker that OOBE has selected the launcher's
             // data layout. If it is absent, start a clean OOBE process instead of silently
@@ -131,12 +130,6 @@ internal static class Program
             if (args.Contains("--validate-native-runtime", StringComparer.OrdinalIgnoreCase))
             {
                 int validationExitCode = ValidateNativeRuntime();
-                completedNormally = true;
-                return validationExitCode;
-            }
-            if (args.Contains("--validate-secrets", StringComparer.OrdinalIgnoreCase))
-            {
-                int validationExitCode = PclEmbeddedSecrets.Count > 0 ? 0 : 2;
                 completedNormally = true;
                 return validationExitCode;
             }

@@ -190,66 +190,7 @@
                     </Grid>
                 </Grid>
 
-                <!-- 6: Mandatory service data and optional experience program -->
-                <Grid x:Name="PageTelemetry" IsVisible="False" Opacity="0" IsHitTestVisible="False" Margin="32,24,32,22">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock x:Name="LabTelemetryTitle" Grid.Row="0"
-                               Text="遥测与数据收集"
-                               FontSize="24" FontWeight="SemiBold"
-                               Margin="0,0,0,14"
-                               Foreground="{DynamicResource ColorBrush1}" />
-                    <legacy:MyScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="0,0,10,0" Spacing="10">
-                            <Border Padding="14,12" CornerRadius="10" Background="{DynamicResource ColorBrushHalfWhite}">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Essential.Title}"
-                                               FontSize="16" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Essential.Intro}"
-                                               TextWrapping="Wrap" Opacity="0.78"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Essential.Items}"
-                                               TextWrapping="Wrap" LineHeight="18"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Essential.Excludes}"
-                                               TextWrapping="Wrap" Opacity="0.72"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                </StackPanel>
-                            </Border>
-                            <Border Padding="14,12" CornerRadius="10" Background="{DynamicResource ColorBrushHalfWhite}">
-                                <StackPanel Spacing="7">
-                                    <legacy:MyCheckBox x:Name="CheckExperienceProgram"
-                                                       Text="{DynamicResource Oobe.Telemetry.Experience.Toggle}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Experience.Intro}"
-                                               TextWrapping="Wrap" Opacity="0.78"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Experience.Items}"
-                                               TextWrapping="Wrap" LineHeight="18"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                    <TextBlock Text="{DynamicResource Oobe.Telemetry.Experience.Withdraw}"
-                                               TextWrapping="Wrap" Opacity="0.72"
-                                               Foreground="{DynamicResource ColorBrush1}" />
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </legacy:MyScrollViewer>
-                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
-                        <legacy:MyButton x:Name="BtnTelemetryPrev" Grid.Column="1"
-                                         ColorType="Normal" UseExperimentalStyle="True"
-                                         Text="上一页" MinWidth="110" Height="36" Padding="14,0" Margin="0,0,10,0"
-                                         Click="BtnTelemetryPrev_Click" />
-                        <legacy:MyButton x:Name="BtnTelemetryNext" Grid.Column="2"
-                                         ColorType="Highlight" UseExperimentalStyle="True"
-                                         Text="下一页" MinWidth="120" Height="36" Padding="14,0"
-                                         Click="BtnTelemetryNext_Click" />
-                    </Grid>
-                </Grid>
-
-                <!-- 7: Finish (layout similar to page 1) -->
+                <!-- 6: Finish (layout similar to page 1) -->
                 <Grid x:Name="PageFinish" IsVisible="False" Opacity="0" IsHitTestVisible="False">
                     <Image x:Name="FinishIcon"
                            Source="avares://PCL.Desktop/Assets/icon.png"

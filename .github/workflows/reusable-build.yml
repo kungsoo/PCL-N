@@ -45,11 +45,6 @@ on:
         required: false
         default: ""
         type: string
-      require_ms_client_id:
-        description: Fail the build when Microsoft OAuth CLIENT_ID secret is missing
-        required: false
-        default: true
-        type: boolean
       # Channel stamped into embedded metadata.json (release | beta | ci).
       # Empty = derive from configuration (Release→release, Beta→beta, CI→ci).
       channel:
@@ -62,37 +57,6 @@ on:
         default: ""
         type: string
     secrets:
-      # Prefer CLIENT_ID (legacy name). MS_CLIENT_ID / PCL_MS_CLIENT_ID are accepted aliases.
-      CLIENT_ID:
-        required: false
-      MS_CLIENT_ID:
-        required: false
-      PCL_MS_CLIENT_ID:
-        required: false
-      LITTLESKIN_CLIENT_ID:
-        required: false
-      LITTLESKIN_CLIENT_SECRET:
-        required: false
-      LITTLESKIN_REDIRECT_URI:
-        required: false
-      CURSEFORGE_API_KEY:
-        required: false
-      SENTRY_DSN:
-        required: false
-      SENTRY_ESSENTIAL_DSN:
-        required: false
-      POSTHOG_PROJECT_TOKEN:
-        required: false
-      POSTHOG_HOST:
-        required: false
-      NAID_CLIENT_ID:
-        required: false
-      NAID_CLIENT_SECRET:
-        required: false
-      LINK_SERVER_ROOTS:
-        required: false
-      LOBBY_DEFAULT_SECRET:
-        required: false
       # PAT for private PCL.Plugin (contents:read).
       # Release and beta channels fail before checkout when this secret is absent.
       PCL_PLUGIN_TOKEN:
@@ -233,42 +197,6 @@ jobs:
           echo "Ensure PCL_PLUGIN_TOKEN can read private PCL.Plugin and that a v* plugin tag exists."
           exit 1
 
-      - name: Resolve Microsoft Client ID secret
-        id: ms_client
-        shell: bash
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
-          PCL_MS_CLIENT_ID: ${{ secrets.PCL_MS_CLIENT_ID }}
-        run: |
-          set -euo pipefail
-          value=""
-          if [[ -n "${PCL_MS_CLIENT_ID:-}" ]]; then
-            value="$PCL_MS_CLIENT_ID"
-          elif [[ -n "${MS_CLIENT_ID:-}" ]]; then
-            value="$MS_CLIENT_ID"
-          elif [[ -n "${CLIENT_ID:-}" ]]; then
-            value="$CLIENT_ID"
-          fi
-          echo "has_value=$([[ -n "$value" ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          # Mask and export for later steps (do not print value).
-          if [[ -n "$value" ]]; then
-            echo "::add-mask::$value"
-            echo "PCL_MS_CLIENT_ID=$value" >> "$GITHUB_ENV"
-          fi
-
-      - name: Require Microsoft Client ID for publish builds
-        if: ${{ inputs.require_ms_client_id }}
-        shell: bash
-        run: |
-          if [[ "${{ steps.ms_client.outputs.has_value }}" != "true" ]]; then
-            echo "::error::Missing Microsoft OAuth client id secret."
-            echo "Add a repository secret named CLIENT_ID (or MS_CLIENT_ID / PCL_MS_CLIENT_ID)."
-            echo "It is embedded into the binary at publish time via PCL_WRITE_SECRET."
-            exit 1
-          fi
-          echo "Microsoft CLIENT_ID secret is present (value masked)."
-
       - name: Stamp build metadata (channel / version / commit)
         id: stamp
         shell: bash
@@ -326,22 +254,6 @@ jobs:
       - name: Publish Avalonia desktop
         shell: bash
         env:
-          PCL_WRITE_SECRET: '1'
-          # Prefer env written by Resolve step; fall back to raw secrets for other keys.
-          PCL_MS_CLIENT_ID: ${{ env.PCL_MS_CLIENT_ID }}
-          PCL_LITTLESKIN_CLIENT_ID: ${{ secrets.LITTLESKIN_CLIENT_ID }}
-          PCL_LITTLESKIN_CLIENT_SECRET: ${{ secrets.LITTLESKIN_CLIENT_SECRET }}
-          PCL_LITTLESKIN_REDIRECT_URI: ${{ secrets.LITTLESKIN_REDIRECT_URI }}
-          PCL_CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-          PCL_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          PCL_SENTRY_ESSENTIAL_DSN: ${{ secrets.SENTRY_ESSENTIAL_DSN }}
-          PCL_POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
-          PCL_POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
-          PCL_NAID_CLIENT_ID: ${{ secrets.NAID_CLIENT_ID }}
-          PCL_NAID_CLIENT_SECRET: ${{ secrets.NAID_CLIENT_SECRET }}
-          PCL_LINK_SERVER_ROOT: ${{ secrets.LINK_SERVER_ROOTS }}
-          PCL_LOBBY_DEFAULT_SECRET: ${{ secrets.LOBBY_DEFAULT_SECRET }}
-          PCL_GITHUB_SHA: ${{ github.sha }}
         run: |
           set -eo pipefail
 
@@ -385,7 +297,6 @@ jobs:
             -p:PublishSingleFile=false \
             -p:PclRuntimeVariant="${{ inputs.runtime_variant }}" \
             -p:PclHpatchzPath="$PCL_HPATCHZ_PATH" \
-            -p:PclWriteSecret=1 \
             -p:PclPluginSidecarZipPath= \
             -p:PclNativeRuntimeZipPath= \
             -p:DebugType=None \
@@ -415,7 +326,6 @@ jobs:
             -p:PublishSingleFile=false \
             -p:PclRuntimeVariant="${{ inputs.runtime_variant }}" \
             -p:PclHpatchzPath="$PCL_HPATCHZ_PATH" \
-            -p:PclWriteSecret=1 \
             -p:PclNativeRuntimeZipPath="$native_zip" \
             -p:DebugType=None \
             -p:DebugSymbols=false \
@@ -481,19 +391,8 @@ jobs:
             fi
             echo "Embedded native rendering runtime validation passed."
 
-            if [[ "${{ inputs.require_ms_client_id }}" == "true" ]]; then
-              if ! "$binary" --validate-secrets; then
-                echo "::error::Published binary is missing embedded secrets (PCL_WRITE_SECRET / CLIENT_ID)."
-                exit 1
-              fi
-              echo "Embedded secrets validation passed (native execute)."
-            fi
           else
             echo "Skipping native runtime execution for cross-arch RID '$rid' on ${{ runner.os }}/${{ runner.arch }}."
-            if [[ "${{ inputs.require_ms_client_id }}" == "true" ]]; then
-              echo "Skipping native --validate-secrets for cross-arch RID '$rid' on ${{ runner.os }}/${{ runner.arch }}."
-              echo "Secret presence was already enforced at build time (require_ms_client_id + PCL_WRITE_SECRET)."
-            fi
           fi
 
       - name: Create macOS application bundle

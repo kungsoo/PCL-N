@@ -120,7 +120,6 @@ internal static class LauncherSettingsPageBinder
                         ? current with { AutomaticallyRepairGameIssues = value }
                         : current;
                 });
-                TrackSettingChange(tag);
             };
         }
 
@@ -227,7 +226,6 @@ internal static class LauncherSettingsPageBinder
                             ThemeAvailabilityPolicy.MarkManualThemeSelection();
                             AvaloniaThemeManager.Apply(confirmed);
                             SettingsChanged?.Invoke(confirmed);
-                            TrackSettingChange(tag);
                         });
                     return;
                 }
@@ -266,7 +264,6 @@ internal static class LauncherSettingsPageBinder
                 if (shouldApplyTheme)
                     AvaloniaThemeManager.Apply(settings);
                 SettingsChanged?.Invoke(settings);
-                TrackSettingChange(tag);
             }
 
             comboBox.SelectionChanged += (_, _) => PersistComboBox();
@@ -310,7 +307,6 @@ internal static class LauncherSettingsPageBinder
                     current.SetIntegerOption(tag, value);
                     return current;
                 });
-                TrackSettingChange(tag);
             };
         }
 
@@ -359,18 +355,9 @@ internal static class LauncherSettingsPageBinder
                     current.SetIntegerOption(key, value);
                     return current;
                 });
-                TrackSettingChange(key);
             };
         }
     }
-
-    private static void TrackSettingChange(string key) =>
-        LauncherTelemetry.CaptureEvent(
-            "setting_feature_changed",
-            new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["setting"] = TelemetryDataPolicy.NormalizeName(key)
-            });
 
     internal static bool ResetPage(MyPageRight page)
     {

@@ -84,8 +84,7 @@ internal static class MinecraftLaunchPlanFactory
                 JvmHostIdentityMode = profile.Kind switch
                 {
                     LaunchLoginProfileKind.ThirdParty or
-                        LaunchLoginProfileKind.LittleSkin or
-                        LaunchLoginProfileKind.NCloud => MinecraftJvmHostIdentityMode.ThirdParty,
+                        LaunchLoginProfileKind.LittleSkin => MinecraftJvmHostIdentityMode.ThirdParty,
                     LaunchLoginProfileKind.Offline => MinecraftJvmHostIdentityMode.Offline,
                     _ => MinecraftJvmHostIdentityMode.Official
                 },
@@ -304,13 +303,11 @@ internal static class MinecraftLaunchPlanFactory
         bool experimentalJvmHostEnabled,
         LaunchLoginProfileKind profileKind)
     {
-        // LittleSkin and N Cloud issue standard Yggdrasil sessions whose texture and
+        // LittleSkin issues standard Yggdrasil sessions whose texture and
         // join-server behavior must be handled by the compatibility agent. The embedded
         // host's local session bridge is intentionally not used for these providers.
         return experimentalJvmHostEnabled &&
-               profileKind is not (
-                   LaunchLoginProfileKind.LittleSkin or
-                   LaunchLoginProfileKind.NCloud);
+               profileKind is not LaunchLoginProfileKind.LittleSkin;
     }
 
     private static async Task<int> ResolveJavaMajorVersionAsync(
@@ -337,7 +334,6 @@ internal static class MinecraftLaunchPlanFactory
             .ConfigureAwait(false);
 
         // Host mode takes over compatible generic third-party accounts. LittleSkin and
-        // N Cloud are excluded before this method and always keep the standard agent path.
         if (useJvmHost)
             return (null, authServer, metadata);
 

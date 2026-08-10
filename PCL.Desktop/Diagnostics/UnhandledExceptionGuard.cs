@@ -261,8 +261,6 @@ internal static class UnhandledExceptionGuard
                 // Logging must never throw out of the guard.
             }
 
-            LauncherTelemetry.ReportUnhandledException(exception, source, canContinue);
-
             ShowCrashUi(exception, report, canContinue);
         }
         finally

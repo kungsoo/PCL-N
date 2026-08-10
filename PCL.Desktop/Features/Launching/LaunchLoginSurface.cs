@@ -20,7 +20,6 @@ public sealed class LaunchLoginSurface
     private PageLoginProfileSkin? _profileSkinPage;
     private PageLoginMs? _msPage;
     private PageLoginLittleSkin? _littleSkinPage;
-    private PageLoginNCloud? _nCloudPage;
     private PageLoginAuth? _authPage;
     private PageLoginOffline? _offlinePage;
 
@@ -32,7 +31,6 @@ public sealed class LaunchLoginSurface
 
     public PageLoginLittleSkin? LittleSkinPage => _littleSkinPage;
 
-    public PageLoginNCloud? NCloudPage => _nCloudPage;
 
     public PageLoginAuth? AuthPage => _authPage;
 
@@ -105,13 +103,6 @@ public sealed class LaunchLoginSurface
                     PageLaunchLeft.LaunchLoginPageType.LittleSkin);
                 break;
 
-            case PageLaunchLeft.LaunchLoginPageType.NCloud:
-                launchPage.SetLoginPage(
-                    EnsureNCloudLoginPage(launchPage),
-                    animate: true,
-                    PageLaunchLeft.LaunchLoginPageType.NCloud);
-                break;
-
             case PageLaunchLeft.LaunchLoginPageType.Auth:
                 launchPage.SetLoginPage(
                     EnsureAuthLoginPage(launchPage),
@@ -160,7 +151,6 @@ public sealed class LaunchLoginSurface
         _profileSkinPage = null;
         _msPage = null;
         _littleSkinPage = null;
-        _nCloudPage = null;
         _authPage = null;
         _offlinePage = null;
     }
@@ -250,20 +240,6 @@ public sealed class LaunchLoginSurface
         return page;
     }
 
-    private PageLoginNCloud EnsureNCloudLoginPage(ILaunchHomeSurface launchPage)
-    {
-        LaunchLoginBindings b = RequireBindings();
-        EnsureLaunchPage(launchPage);
-        if (_nCloudPage is not null)
-            return _nCloudPage;
-
-        PageLoginNCloud page = new();
-        page.BackRequested += (_, _) => launchPage.RefreshPage(anim: true);
-        page.LoginRequested += (_, _) => _ = b.StartNCloudLoginAsync(page, launchPage);
-        _nCloudPage = page;
-        return page;
-    }
-
     private PageLoginOffline EnsureOfflineLoginPage(ILaunchHomeSurface launchPage)
     {
         LaunchLoginBindings b = RequireBindings();
@@ -308,8 +284,6 @@ public sealed class LaunchLoginBindings
     public required Func<PageLoginMs, ILaunchHomeSurface, Task> StartMicrosoftLoginAsync { get; init; }
 
     public required Func<PageLoginLittleSkin, ILaunchHomeSurface, Task> StartLittleSkinLoginAsync { get; init; }
-
-    public required Func<PageLoginNCloud, ILaunchHomeSurface, Task> StartNCloudLoginAsync { get; init; }
 
     public required Action<string, bool> OpenAuthAccountPage { get; init; }
 

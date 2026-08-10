@@ -10,7 +10,6 @@ using PCL.Core.App;
 using PCL.Core.Logging;
 using PCL.Desktop.Features.Settings.Views;
 using PCL.Desktop.Localization;
-using PCL.Desktop.Telemetry;
 
 namespace PCL.Desktop.Hosting;
 
@@ -94,9 +93,6 @@ internal sealed class LauncherUpdateCoordinator : IDisposable
         UpdateChannel channel,
         CancellationToken cancellationToken = default)
     {
-        using TelemetryOperation operation = LauncherTelemetry.StartOperation(
-            "launcher.update_check",
-            "ipc.request");
         await _operationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
@@ -106,24 +102,14 @@ internal sealed class LauncherUpdateCoordinator : IDisposable
                     CurrentCommit,
                     cancellationToken)
                 .ConfigureAwait(false);
-            LauncherTelemetry.CaptureEvent(
-                "update_check_completed",
-                new Dictionary<string, string>(StringComparer.Ordinal)
-                {
-                    ["channel"] = channel.ToString(),
-                    ["result"] = !result.Success ? "failed" : result.IsUpdateAvailable ? "available" : "current"
-                });
             return result;
         }
         catch (OperationCanceledException)
         {
-            operation.Cancel();
             throw;
         }
         catch (Exception ex)
         {
-            operation.Fail(ex);
-            LauncherTelemetry.CaptureException(ex, "update.check");
             throw;
         }
         finally
@@ -137,10 +123,6 @@ internal sealed class LauncherUpdateCoordinator : IDisposable
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(package);
-        using TelemetryOperation operation = LauncherTelemetry.StartOperation(
-            "launcher.update_download",
-            "download.file");
-        LauncherTelemetry.CaptureEvent("update_download_started");
         await _operationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
@@ -172,25 +154,14 @@ internal sealed class LauncherUpdateCoordinator : IDisposable
             lock (_sync)
                 _preparedUpdate = prepared;
             PreparedUpdateChanged?.Invoke(prepared);
-            LauncherTelemetry.CaptureEvent(
-                "update_download_completed",
-                new Dictionary<string, string>(StringComparer.Ordinal)
-                {
-                    ["package_type"] = prepared.Package.UsesPatch ? "patch" : "full"
-                });
             return prepared;
         }
         catch (OperationCanceledException)
         {
-            operation.Cancel();
-            LauncherTelemetry.CaptureEvent("update_download_cancelled");
             throw;
         }
         catch (Exception ex)
         {
-            operation.Fail(ex);
-            LauncherTelemetry.CaptureException(ex, "update.download");
-            LauncherTelemetry.CaptureEvent("update_download_failed");
             throw;
         }
         finally

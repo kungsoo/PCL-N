@@ -42,7 +42,6 @@ using PCL.Desktop.Composition;
 using PCL.Desktop.Controls.Legacy;
 using PCL.Desktop.Controls.Motion;
 using PCL.Desktop.Diagnostics;
-using PCL.Desktop.Telemetry;
 using PCL.Desktop.Features.Community;
 using PCL.Desktop.Hosting;
 using PCL.Desktop.Legal;
@@ -1233,13 +1232,6 @@ public partial class MainWindow : Window, IDisposable
             return;
 
         DesktopFileLog.Info("Navigation", $"打开 {descriptor.Title}（{route.Value}）。");
-        LauncherTelemetry.CaptureEvent(
-            "page_opened",
-            new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["page"] = TelemetryDataPolicy.NormalizeName(route.Value)
-            });
-
         selected.Checked = true;
         foreach (MyListItem item in GetNavItems())
         {
@@ -1279,9 +1271,6 @@ public partial class MainWindow : Window, IDisposable
         _currentNavRoute = descriptor.Route;
         _pendingNavRoute = null;
         int requestId = ++_registeredPageRequestId;
-        TelemetryOperation pageLoad = LauncherTelemetry.StartOperation(
-            "page.load." + TelemetryDataPolicy.NormalizeName(descriptor.Route.Value),
-            "page.load");
         PageCreateContext context = new(descriptor.Route.Value, DesktopHost.Current.Services, _desktopPageContext);
         ValueTask<DesktopMainPage> createTask;
         try
@@ -1290,8 +1279,6 @@ public partial class MainWindow : Window, IDisposable
         }
         catch (Exception ex)
         {
-            pageLoad.Fail(ex);
-            LauncherTelemetry.CaptureException(ex, "page.load");
             ApplyPageCreationError(descriptor.Title, ex);
             return;
         }
@@ -1299,36 +1286,30 @@ public partial class MainWindow : Window, IDisposable
         if (createTask.IsCompletedSuccessfully)
         {
             ApplyRegisteredMainPage(createTask.Result);
-            pageLoad.Complete();
             return;
         }
 
         ApplyRegisteredMainPage(CreateLoadingMainPage(descriptor.Title));
-        _ = CompleteRegisteredPageAsync(createTask.AsTask(), requestId, descriptor.Title, pageLoad);
+        _ = CompleteRegisteredPageAsync(createTask.AsTask(), requestId, descriptor.Title);
     }
 
     private async Task CompleteRegisteredPageAsync(
         Task<DesktopMainPage> createTask,
         int requestId,
-        string pageTitle,
-        TelemetryOperation pageLoad)
+        string pageTitle)
     {
         try
         {
             DesktopMainPage page = await createTask.ConfigureAwait(true);
             if (requestId != _registeredPageRequestId)
             {
-                pageLoad.Cancel();
                 return;
             }
 
             ApplyRegisteredMainPage(page);
-            pageLoad.Complete();
         }
         catch (Exception ex)
         {
-            pageLoad.Fail(ex);
-            LauncherTelemetry.CaptureException(ex, "page.load");
             if (requestId == _registeredPageRequestId)
                 ApplyPageCreationError(pageTitle, ex);
         }
@@ -3818,8 +3799,7 @@ public partial class MainWindow : Window, IDisposable
             if (!ReferenceEquals(args.Result.Profile, args.OriginalProfile) &&
                 args.Result.Profile.Kind is
                     LaunchLoginProfileKind.Microsoft or
-                    LaunchLoginProfileKind.LittleSkin or
-                    LaunchLoginProfileKind.NCloud)
+                    LaunchLoginProfileKind.LittleSkin)
             {
                 AddOrUpdateLoginProfile(args.Result.Profile);
                 _launchLoginSurface.ProfilePage?.SetProfiles(_loginProfiles, args.Result.Profile);
@@ -3827,9 +3807,7 @@ public partial class MainWindow : Window, IDisposable
                 SaveProfilesInBackground(
                     args.Result.Profile.Kind == LaunchLoginProfileKind.LittleSkin
                         ? "刷新 LittleSkin OAuth 档案"
-                        : args.Result.Profile.Kind == LaunchLoginProfileKind.NCloud
-                            ? "刷新 N Cloud 在线档案"
-                            : "刷新 Microsoft 正版档案");
+                        : "刷新 Microsoft 正版档案");
             }
 
             Process process = args.Result.Process;
@@ -4056,32 +4034,6 @@ public partial class MainWindow : Window, IDisposable
         if (profile.Kind == LaunchLoginProfileKind.LittleSkin)
             return await RefreshLittleSkinLaunchProfileAsync(profile, cancellationToken, status)
                 .ConfigureAwait(false);
-
-        if (profile.Kind == LaunchLoginProfileKind.NCloud)
-        {
-            Report("正在刷新 N Cloud 会话…");
-            IHostOnlineMinecraftAccountProvider? provider =
-                HostOnlineMinecraftAccountProvider.Current;
-            if (provider?.IsAuthenticated != true)
-            {
-                throw new InvalidOperationException(
-                    "N Cloud 档案需要已登录的在线服务账户。请在设置中重新连接账户。");
-            }
-
-            HostOnlineMinecraftSession session = await provider
-                .CreateSessionAsync(cancellationToken)
-                .ConfigureAwait(false);
-            Report("N Cloud 会话已刷新。");
-            return profile with
-            {
-                Username = session.Username,
-                Uuid = session.Uuid,
-                AccessToken = session.AccessToken,
-                ClientToken = session.ClientToken,
-                AuthServer = session.AuthServer,
-                SkinAddress = session.SkinAddress ?? profile.SkinAddress
-            };
-        }
 
         if (profile.Kind != LaunchLoginProfileKind.Microsoft ||
             string.IsNullOrWhiteSpace(profile.RefreshToken))
@@ -5316,7 +5268,6 @@ public partial class MainWindow : Window, IDisposable
 
     private void ApplyRuntimeSettings(LauncherSettings settings)
     {
-        LauncherTelemetry.ApplySettings(settings);
         DesktopFileLog.ConfigureLevel(DesktopFileLog.LevelFromSetting(settings.GetIntegerOption(
             "SystemLogLevel",
             LauncherSettingDefaults.GetInteger("SystemLogLevel"))));

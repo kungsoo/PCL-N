@@ -26,7 +26,7 @@ internal static class OobeConfiguration
     public const string SettingsKeyCompletedVersionLegacy = "UiFirstRunWizardVersion";
 
     public const string ForceArgument = "--oobe";
-    /// <summary>Resume OOBE after config-dir restart: Welcome → Online → Telemetry → Finish.</summary>
+    /// <summary>Resume OOBE after config-dir restart: Welcome → Online → Finish.</summary>
     public const string ResumeArgument = "--oobe-resume";
     public const string DisableEnvironmentVariable = "PCL_DISABLE_FIRST_RUN";
     public const string SettingsKeyPendingResume = "UiOobePendingResume";
@@ -182,7 +182,6 @@ internal static class OobeConfiguration
     [
         OobeStepId.Welcome,
         OobeStepId.Online,
-        OobeStepId.Telemetry,
         OobeStepId.Finish
     ];
 
@@ -441,10 +440,6 @@ internal static class OobeConfiguration
             case "cloud":
                 step = OobeStepId.Online;
                 return true;
-            case "telemetry":
-            case "privacy-telemetry":
-                step = OobeStepId.Telemetry;
-                return true;
             case "finish":
             case "done":
             case "complete":
@@ -463,7 +458,6 @@ public enum OobeStepId
     Privacy,
     DataPaths,
     Online,
-    Telemetry,
     Finish
 }
 
@@ -491,17 +485,15 @@ internal sealed class OobeManifest
         OobeStepId.Privacy,
         OobeStepId.DataPaths,
         OobeStepId.Online,
-        OobeStepId.Telemetry,
         OobeStepId.Finish
     ];
 
-    /// <summary>Post-update default re-presents changed legal and telemetry terms.</summary>
+    /// <summary>Post-update default re-presents changed legal terms.</summary>
     public static IReadOnlyList<OobeStepId> DefaultUpdateSteps { get; } =
     [
         OobeStepId.Welcome,
         OobeStepId.Terms,
         OobeStepId.Privacy,
-        OobeStepId.Telemetry,
         OobeStepId.Finish
     ];
 

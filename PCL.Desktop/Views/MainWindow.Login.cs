@@ -79,7 +79,6 @@ public partial class MainWindow
             OpenUrl = OpenExternalUrl,
             StartMicrosoftLoginAsync = StartMicrosoftLoginAsync,
             StartLittleSkinLoginAsync = StartLittleSkinLoginAsync,
-            StartNCloudLoginAsync = StartNCloudLoginAsync,
             OpenAuthAccountPage = OpenAuthAccountPage,
             StartThirdPartyLoginAsync = StartThirdPartyAuthLoginAsync,
             CreateOfflineProfile = CreateOfflineLoginProfile
@@ -177,12 +176,6 @@ public partial class MainWindow
         }
 
         if (profile.Kind == LaunchLoginProfileKind.LittleSkin)
-        {
-            _ = OpenExperimentalAppearancePageAsync(profile);
-            return;
-        }
-
-        if (profile.Kind == LaunchLoginProfileKind.NCloud)
         {
             _ = OpenExperimentalAppearancePageAsync(profile);
             return;
@@ -372,16 +365,6 @@ public partial class MainWindow
             return;
         }
 
-        if (profile.Kind == LaunchLoginProfileKind.NCloud)
-        {
-            OpenExternalUrl("https://pcln.top/#/account");
-            ShowTextDialog(
-                "管理 N Cloud 账户",
-                "已打开 PCL N 在线账户页面。N Cloud 不会把账户密码交给启动器。",
-                "知道了");
-            return;
-        }
-
         if (profile.Kind is LaunchLoginProfileKind.ThirdParty or LaunchLoginProfileKind.LittleSkin)
         {
             OpenAuthServerProfilePage(profile, "修改密码");
@@ -413,15 +396,6 @@ public partial class MainWindow
             return;
         }
 
-        if (profile.Kind == LaunchLoginProfileKind.NCloud)
-        {
-            OpenExternalUrl("https://pcln.top/#/account");
-            ShowTextDialog(
-                "修改 N Cloud 档案",
-                "已打开 PCL N 在线账户页面。修改云端玩家名后，重新登录或启动游戏即可同步。",
-                "知道了");
-            return;
-        }
 
         if (profile.Kind is LaunchLoginProfileKind.ThirdParty or LaunchLoginProfileKind.LittleSkin)
         {
@@ -677,23 +651,6 @@ public partial class MainWindow
                 return;
             }
 
-            if (profile.Kind == LaunchLoginProfileKind.NCloud)
-            {
-                LoginProfileInfo refreshed = await RefreshLaunchProfileAsync(
-                        profile,
-                        CancellationToken.None)
-                    .ConfigureAwait(true);
-                ReplaceLoginProfile(profile, refreshed);
-                _launchLoginSurface.ProfilePage?.SetProfiles(_loginProfiles, refreshed);
-                page.SetProfile(refreshed);
-                SaveProfilesInBackground("刷新 N Cloud 外观");
-                ShowTextDialog(
-                    "外观已刷新",
-                    "已从 N Cloud 重新获取当前皮肤。",
-                    "知道了");
-                return;
-            }
-
             page.Reload();
             ShowTextDialog(
                 "已刷新档案显示",
@@ -711,8 +668,6 @@ public partial class MainWindow
 
     private void ShowProfileTypeSelector(ILaunchHomeSurface launchPage)
     {
-        bool useNCloud =
-            HostOnlineMinecraftAccountProvider.Current?.IsAuthenticated == true;
         MyMsgSelect dialog = new();
         dialog.Configure(
             "选择账户类型",
@@ -730,11 +685,9 @@ public partial class MainWindow
                     "使用自定义 Yggdrasil 兼容认证服务器登录。",
                     "lucide/network"),
                 CreateProfileTypeItem(
-                    useNCloud ? "N Cloud 在线账户" : "离线登录",
-                    useNCloud
-                        ? "使用已登录的在线服务账户；支持云端皮肤与在线会话。"
-                        : "创建本地离线档案。联机服务器可能不会接受此档案。",
-                    useNCloud ? "lucide/cloud" : "lucide/link-2-off")
+                    "离线登录",
+                    "创建本地离线档案。联机服务器可能不会接受此档案。",
+                    "lucide/link-2-off")
             ]);
         ShowSelectionDialog(dialog, selectedIndex =>
         {
@@ -746,9 +699,7 @@ public partial class MainWindow
                 0 => PageLaunchLeft.LaunchLoginPageType.Ms,
                 1 => PageLaunchLeft.LaunchLoginPageType.LittleSkin,
                 2 => PageLaunchLeft.LaunchLoginPageType.Auth,
-                3 => useNCloud
-                    ? PageLaunchLeft.LaunchLoginPageType.NCloud
-                    : PageLaunchLeft.LaunchLoginPageType.Offline,
+                3 => PageLaunchLeft.LaunchLoginPageType.Offline,
                 _ => null
             };
             if (target is null)
@@ -1336,22 +1287,6 @@ public partial class MainWindow
             List<LoginProfileInfo> profiles = result.Profiles.Profiles
                 .Select(ToLoginProfileInfo)
                 .ToList();
-            bool migratedNCloudEndpoint = result.Profiles.Profiles
-                .Zip(profiles)
-                .Any(pair =>
-                    pair.First.Kind == LaunchProfileKind.NCloud &&
-                    !string.Equals(
-                        pair.First.AuthServer,
-                        pair.Second.AuthServer,
-                        StringComparison.OrdinalIgnoreCase));
-            if (migratedNCloudEndpoint)
-            {
-                await store.SaveAsync(new LaunchProfileSet
-                    {
-                        Profiles = profiles.Select(ToLaunchProfile).ToArray()
-                    })
-                    .ConfigureAwait(false);
-            }
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 _loginProfiles.Clear();
@@ -1360,8 +1295,6 @@ public partial class MainWindow
                 _launchLeft?.SetSelectedProfilePresent(_loginProfiles.Count > 0);
                 if (result.WasRecovered)
                     _launchRight?.AppendLog($"账户档案配置已重置，损坏文件已备份到：{result.BackupPath}");
-                if (migratedNCloudEndpoint)
-                    _launchRight?.AppendLog("已自动迁移旧版 N Cloud 认证服务器地址。");
             });
 
             LoginProfileInfo? microsoftProfile = profiles.FirstOrDefault(static profile =>
@@ -1410,60 +1343,6 @@ public partial class MainWindow
         {
             Task predecessor = _profileSaveQueue;
             _profileSaveQueue = SaveProfilesAfterAsync(predecessor, snapshot, action);
-        }
-    }
-
-    private async Task StartNCloudLoginAsync(
-        PageLoginNCloud page,
-        ILaunchHomeSurface launchPage)
-    {
-        try
-        {
-            IHostOnlineMinecraftAccountProvider? provider =
-                HostOnlineMinecraftAccountProvider.Current;
-            if (provider?.IsAuthenticated != true)
-            {
-                throw new InvalidOperationException(
-                    "当前没有已登录的 PCL N 在线服务账户，请先在设置中连接账户。");
-            }
-
-            _launchRight?.AppendLog("正在创建 N Cloud 在线会话。");
-            page.UpdateProgress(0.2d);
-            HostOnlineMinecraftSession session = await provider
-                .CreateSessionAsync()
-                .ConfigureAwait(true);
-            page.UpdateProgress(0.8d);
-            LoginProfileInfo profile = new(
-                session.Username,
-                "N Cloud 在线账户",
-                LaunchLoginProfileKind.NCloud,
-                session.Uuid,
-                SvgIcon: "lucide/cloud",
-                SkinAddress: session.SkinAddress,
-                AuthServer: session.AuthServer,
-                AccessToken: session.AccessToken,
-                ClientToken: session.ClientToken);
-            AddOrUpdateLoginProfile(profile);
-            _launchLoginSurface.ProfilePage?.SetProfiles(_loginProfiles, profile);
-            _launchLoginSurface.ProfileSkinPage?.SetProfile(profile);
-            launchPage.SetSelectedProfilePresent(true);
-            launchPage.RefreshPage(anim: true);
-            SaveProfilesInBackground("保存 N Cloud 在线档案");
-            page.UpdateProgress(1d);
-            _launchRight?.AppendLog($"N Cloud 登录成功，已选中档案 {profile.Username}。");
-            ShowTextDialog(
-                "登录成功",
-                $"已添加并选中 N Cloud 在线档案 {profile.Username}。",
-                "知道了");
-        }
-        catch (Exception exception)
-        {
-            _launchRight?.AppendLog("N Cloud 登录失败：" + exception.Message);
-            ShowTextDialog("N Cloud 登录失败", exception.Message, "知道了");
-        }
-        finally
-        {
-            page.FinishLogin();
         }
     }
 
@@ -1825,13 +1704,10 @@ public partial class MainWindow
         {
             LaunchProfileKind.Microsoft => LaunchLoginProfileKind.Microsoft,
             LaunchProfileKind.LittleSkin => LaunchLoginProfileKind.LittleSkin,
-            LaunchProfileKind.NCloud => LaunchLoginProfileKind.NCloud,
             LaunchProfileKind.ThirdParty => LaunchLoginProfileKind.ThirdParty,
             _ => LaunchLoginProfileKind.Offline
         };
-        string authServer = kind == LaunchLoginProfileKind.NCloud
-            ? AuthlibInjectorService.NormalizeAuthServer(profile.AuthServer)
-            : profile.AuthServer;
+        string authServer = profile.AuthServer;
         return new LoginProfileInfo(
             profile.Username,
             profile.Info,
@@ -1857,7 +1733,6 @@ public partial class MainWindow
             {
                 LaunchLoginProfileKind.Microsoft => LaunchProfileKind.Microsoft,
                 LaunchLoginProfileKind.LittleSkin => LaunchProfileKind.LittleSkin,
-                LaunchLoginProfileKind.NCloud => LaunchProfileKind.NCloud,
                 LaunchLoginProfileKind.ThirdParty => LaunchProfileKind.ThirdParty,
                 _ => LaunchProfileKind.Offline
             },

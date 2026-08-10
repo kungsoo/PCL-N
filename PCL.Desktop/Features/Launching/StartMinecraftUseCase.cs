@@ -62,24 +62,9 @@ public sealed class StartMinecraftUseCase
         LaunchInstanceInfo instance = request.Instance;
         string? worldName = request.WorldName;
         string? serverAddress = request.ServerAddress;
-        using TelemetryOperation launchOperation = LauncherTelemetry.StartOperation(
-            "game.launch",
-            "game.launch");
-        LauncherTelemetry.CaptureEvent(
-            "game_launch_started",
-            new Dictionary<string, string>(StringComparer.Ordinal)
-            {
-                ["repair_mode"] = repairSession is null ? "false" : "true",
-                ["target"] = string.IsNullOrWhiteSpace(serverAddress) ? "singleplayer" : "multiplayer"
-            });
-
         LoginProfileInfo? profile = host.ResolveProfile();
         if (profile is null)
         {
-            launchOperation.Cancel();
-            LauncherTelemetry.CaptureEvent(
-                "game_launch_failed",
-                new Dictionary<string, string>(StringComparer.Ordinal) { ["stage"] = "profile_missing" });
             await TryRollbackRepairAsync(repairSession, "缺少账户档案").ConfigureAwait(false);
             await host.InvokeUiAsync(() =>
             {
@@ -190,13 +175,9 @@ public sealed class StartMinecraftUseCase
                 host.AppendLog("记录启动次数失败：" + countEx.Message);
             }
 
-            launchOperation.Complete();
-            LauncherTelemetry.CaptureEvent("game_launch_succeeded");
         }
         catch (OperationCanceledException)
         {
-            launchOperation.Cancel();
-            LauncherTelemetry.CaptureEvent("game_launch_cancelled");
             await TryStopRepairServerAsync(host).ConfigureAwait(false);
             DesktopFileLog.Warn("LaunchUI", $"实例 {instance.Name} 的启动操作已取消。");
             await TryRollbackRepairAsync(repairSession, "启动取消").ConfigureAwait(false);
@@ -208,15 +189,6 @@ public sealed class StartMinecraftUseCase
         }
         catch (Exception ex)
         {
-            launchOperation.Fail(ex);
-            LauncherTelemetry.CaptureException(ex, "game.launch");
-            LauncherTelemetry.CaptureEvent(
-                "game_launch_failed",
-                new Dictionary<string, string>(StringComparer.Ordinal)
-                {
-                    ["stage"] = "launch_pipeline",
-                    ["failure_category"] = TelemetryDataPolicy.NormalizeName(ex.GetType().Name)
-                });
             DesktopFileLog.Error("LaunchUI", $"实例 {instance.Name} 启动失败。", ex);
             try
             {
