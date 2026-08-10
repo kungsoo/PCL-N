@@ -28,6 +28,21 @@ public sealed class DesktopArchitectureTests
     }
 
     [TestMethod]
+    public void DesktopShellNoLongerExposesLegacyUpdateOrFeedbackEntryPoints()
+    {
+        string desktopRoot = FindDesktopProjectRoot();
+        string leftRail = File.ReadAllText(Path.Combine(desktopRoot, "Features", "Settings", "Views", "PageSetupLeft.axaml"));
+        string mainWindow = File.ReadAllText(Path.Combine(desktopRoot, "Views", "MainWindow.axaml"));
+        string registry = File.ReadAllText(Path.Combine(desktopRoot, "Features", "Settings", "Views", "SetupPageRegistry.cs"));
+
+        Assert.IsFalse(leftRail.Contains("x:Name=\"ItemUpdate\"", StringComparison.Ordinal));
+        Assert.IsFalse(leftRail.Contains("x:Name=\"ItemFeedback\"", StringComparison.Ordinal));
+        Assert.IsFalse(mainWindow.Contains("BtnExtraUpdateRestart", StringComparison.Ordinal));
+        Assert.IsFalse(registry.Contains("SetupPageSubType.Feedback", StringComparison.Ordinal));
+        Assert.IsFalse(registry.Contains("SetupPageSubType.Update", StringComparison.Ordinal));
+    }
+
+    [TestMethod]
     public void HostLocalizationKeepsLegacyFallbacksResolvable()
     {
         string originalLanguage = AvaloniaLocalizationManager.CurrentLanguageCode;

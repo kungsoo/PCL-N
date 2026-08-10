@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System.IO.Compression;
+using PCL.Desktop.Features.Launching.Views;
 using PCL.Desktop.Hosting;
 using PCL.Desktop.Paths;
 
@@ -34,6 +35,13 @@ public sealed class PclEmbeddedNativeRuntimeTests
                 Path.GetFullPath(Path.Combine(localApplicationData, "PCL-N")),
                 Path.GetDirectoryName(overridePath));
         }
+    }
+
+    [TestMethod]
+    public void CurrentMinecraftRoot_UsesLauncherDataDirectory()
+    {
+        string dataDirectory = LauncherPathLayout.ResolveDataDirectory();
+        Assert.AreEqual(Path.Combine(dataDirectory, ".minecraft"), LaunchInstanceDiscovery.GetCurrentMinecraftRoot());
     }
 
     [TestMethod]

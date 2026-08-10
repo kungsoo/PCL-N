@@ -726,10 +726,6 @@ public partial class MainWindow : Window, IDisposable
             rectBg.Width = Math.Max(0d, e.NewSize.Width);
     }
 
-    private void BtnExtraUpdateRestart_Click(object? sender, EventArgs e)
-    {
-    }
-
     private void BtnExtraBack_Click(object? sender, EventArgs e)
     {
         if (GetCurrentRightScroll() is { } scroll)
@@ -1545,12 +1541,6 @@ public partial class MainWindow : Window, IDisposable
         }
 
         StartShowAnimation();
-        // The coordinator performs synchronous settings/lock work before its
-        // first incomplete await. Keep that work off the UI thread so the
-        // initial opacity animation and Window.Show() cannot be starved.
-        UnhandledExceptionGuard.Observe(
-            Task.Run(() => LauncherUpdateCoordinator.Current.StartAutomaticUpdateOnceAsync()),
-            "LauncherUpdateCoordinator.AutomaticStartup");
         // First-run chain: community welcome → special build notice (no EULA gate).
         Dispatcher.UIThread.Post(MaybeShowFirstRunDialogs, DispatcherPriority.Background);
         DesktopFileLog.Info("Window", "主窗口首帧任务已排队；显现动画与后台更新检查均已启动。");
@@ -2328,7 +2318,7 @@ public partial class MainWindow : Window, IDisposable
 
     private static readonly string[] ExtraButtonNames =
     [
-        "BtnExtraUpdateRestart", "BtnExtraBack", "BtnExtraDownload", "BtnExtraApril",
+        "BtnExtraBack", "BtnExtraDownload", "BtnExtraApril",
         "BtnExtraShutdown", "BtnExtraLog", "BtnExtraMusic"
     ];
 
@@ -3197,8 +3187,23 @@ public partial class MainWindow : Window, IDisposable
         CancellationTokenSource cancellation = new();
         if (_taskCancellations.Remove(taskId, out CancellationTokenSource? previous))
         {
-            previous.Cancel();
-            previous.Dispose();
+            try
+            {
+                previous.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // The previous token may already have been disposed by teardown.
+            }
+
+            try
+            {
+                previous.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed; nothing to clean up.
+            }
         }
 
         _taskCancellations.Add(taskId, cancellation);
@@ -3208,7 +3213,16 @@ public partial class MainWindow : Window, IDisposable
     private void CancelTrackedTask(string taskId)
     {
         if (_taskCancellations.TryGetValue(taskId, out CancellationTokenSource? cancellation))
-            cancellation.Cancel();
+        {
+            try
+            {
+                cancellation.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                _taskCancellations.TryRemove(taskId, out _);
+            }
+        }
     }
 
     private void UnregisterTrackedTask(string taskId, CancellationTokenSource cancellation)
@@ -3222,10 +3236,25 @@ public partial class MainWindow : Window, IDisposable
 
     private void DisposeTrackedTasks()
     {
-        foreach (CancellationTokenSource cancellation in _taskCancellations.Values)
+        foreach (KeyValuePair<string, CancellationTokenSource> entry in _taskCancellations.ToArray())
         {
-            cancellation.Cancel();
-            cancellation.Dispose();
+            try
+            {
+                entry.Value.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore already-disposed tasks during teardown.
+            }
+
+            try
+            {
+                entry.Value.Dispose();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Ignore already-disposed tasks during teardown.
+            }
         }
 
         _taskCancellations.Clear();
@@ -3666,7 +3695,22 @@ public partial class MainWindow : Window, IDisposable
         string minecraftRoot = string.IsNullOrWhiteSpace(request.MinecraftRootDirectory)
             ? GetDefaultMinecraftRoot()
             : request.MinecraftRootDirectory;
-        Directory.CreateDirectory(minecraftRoot);
+        try
+        {
+            Directory.CreateDirectory(minecraftRoot);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            string fallbackRoot = Path.Combine(
+                PCL.Desktop.Paths.LauncherPathLayout.ResolveDataDirectory(),
+                ".minecraft");
+            DesktopFileLog.Warn(
+                "Startup",
+                $"无法在目标 Minecraft 根目录创建目录：{minecraftRoot}，将回退到：{fallbackRoot}",
+                ex);
+            minecraftRoot = fallbackRoot;
+            Directory.CreateDirectory(minecraftRoot);
+        }
         LauncherSettings settings = LauncherSettingsPageBinder.LoadSettings();
         int downloadThreadLimit = Math.Clamp(
             settings.GetIntegerOption(LauncherSettingKeys.ToolDownloadThread, 63) + 1,

@@ -278,14 +278,6 @@
                         ZIndex="3">
                     <StackPanel x:Name="PanExtraButtons" Spacing="0">
 
-                        <local:MyExtraButton x:Name="BtnExtraUpdateRestart" HorizontalAlignment="Right"
-
-                                             Click="BtnExtraUpdateRestart_Click"
-
-                                             VerticalAlignment="Center" ToolTip="{DynamicResource Main.Extra.UpdateRestart.ToolTip}"
-
-                                             IsVisible="False"
-                                             SvgIcon="lucide/refresh-cw" />
                         <local:MyExtraButton x:Name="BtnExtraBack" HorizontalAlignment="Right" VerticalAlignment="Center"
 
                                              Click="BtnExtraBack_Click"

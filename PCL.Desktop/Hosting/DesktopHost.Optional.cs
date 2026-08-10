@@ -17,7 +17,6 @@ namespace PCL.Desktop.Hosting;
 internal static partial class DesktopHost
 {
     private static IDisposable? _pnpHandlerRegistration;
-    private static IDisposable? _feedbackHandlerRegistration;
     private static Task<PluginOptionalRuntimeResult>? _optionalRuntimeTask;
 
     /// <summary>Outcome of the background plugin warm-start (available after task completes).</summary>
@@ -116,8 +115,6 @@ internal static partial class DesktopHost
 
             _pnpHandlerRegistration ??= DesktopFileArtifactHost.Instance.Register(
                 new PluginSidecarPnpFileArtifactHandler());
-            _feedbackHandlerRegistration ??= RuntimeExtensionHostAccess.Current.FeedbackSubmission.Register(
-                new PluginSidecarFeedbackSubmissionHandler());
             await PluginSidecarUiInjector.InjectAsync(host).ConfigureAwait(false);
 
             PluginOptionalRuntimeResult ready = new(
@@ -142,8 +139,6 @@ internal static partial class DesktopHost
     {
         try
         {
-            _feedbackHandlerRegistration?.Dispose();
-            _feedbackHandlerRegistration = null;
             _pnpHandlerRegistration?.Dispose();
             _pnpHandlerRegistration = null;
 
