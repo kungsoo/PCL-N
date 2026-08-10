@@ -12,7 +12,6 @@ using PCL.Desktop.Features.Settings.Views;
 using PCL.Desktop.Localization;
 using PCL.Desktop.Diagnostics;
 using PCL.Core.Logging;
-using PCL.Desktop.Telemetry;
 
 namespace PCL.Desktop.Features.Launching;
 

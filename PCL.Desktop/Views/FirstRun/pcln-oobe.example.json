@@ -6,17 +6,15 @@
     "privacy",
     "data",
     "online",
-    "telemetry",
     "finish"
   ],
   "updateSteps": [
     "welcome",
     "terms",
     "privacy",
-    "telemetry",
     "finish"
   ],
   "restartAfterFull": true,
   "restartAfterUpdate": false,
-  "_comment": "Leaving the data step always restarts with --oobe-resume (Welcome → Online → Telemetry → Finish). Sidecar is extracted into the chosen data directory on the next process."
+  "_comment": "Leaving the data step always restarts with --oobe-resume (Welcome → Online → Finish). Sidecar is extracted into the chosen data directory on the next process."
 }

@@ -533,7 +533,7 @@ internal sealed class OobeManifestFile
 {
     public string? ContentVersion { get; set; }
 
-    /// <summary>Step names: welcome, terms, privacy, data, telemetry, finish.</summary>
+    /// <summary>Step names: welcome, terms, privacy, data, finish.</summary>
     public List<string>? FullSteps { get; set; }
 
     /// <summary>Steps for users who already completed an older ContentVersion.</summary>

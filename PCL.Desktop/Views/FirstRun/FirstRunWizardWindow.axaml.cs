@@ -67,7 +67,6 @@ public sealed partial class FirstRunWizardWindow : Window
     private Grid? _pageLegal;
     private Grid? _pageData;
     private Grid? _pageOnline;
-    private Grid? _pageTelemetry;
     private Grid? _pageFinish;
     private MyMarkdownViewer? _labLegalMarkdown;
     private MyScrollViewer? _panLegalScroll;
@@ -241,12 +240,11 @@ public sealed partial class FirstRunWizardWindow : Window
     {
         bool update = _plan.Kind == OobeRunKind.Update;
         bool resume = _plan.Kind == OobeRunKind.Resume;
+
         if (this.FindControl<TextBlock>("LabWelcome") is { } lab)
         {
             lab.Text = resume
-                ? AvaloniaLocalizationManager.GetText(
-                    "Oobe.Welcome.ResumeTitle",
-                    "配置目录已就绪")
+                ? AvaloniaLocalizationManager.GetText("Oobe.Welcome.ResumeTitle", "配置目录已就绪")
                 : update
                     ? AvaloniaLocalizationManager.GetText("Oobe.Welcome.UpdateTitle", "PCL N Edition 已更新")
                     : AvaloniaLocalizationManager.GetText("Oobe.Welcome.Title", "欢迎使用 PCL N Edition");
@@ -960,7 +958,6 @@ public sealed partial class FirstRunWizardWindow : Window
             }
 
             OobeConfiguration.MarkCompleted(_plan.ContentVersion);
-            PersistTelemetryChoice();
             LauncherSettingsPageBinder.UpdateSettings(current =>
             {
                 if (_plan.Steps.Contains(OobeStepId.Terms) || _plan.Steps.Contains(OobeStepId.Privacy))

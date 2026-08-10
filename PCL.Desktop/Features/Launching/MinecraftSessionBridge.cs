@@ -862,8 +862,7 @@ internal sealed class MinecraftSessionBridge : IDisposable
         {
             ["onlineChat"] = new JsonObject { ["enabled"] = true },
             ["multiplayerServer"] = new JsonObject { ["enabled"] = true },
-            ["multiplayerRealms"] = new JsonObject { ["enabled"] = false },
-            ["telemetry"] = new JsonObject { ["enabled"] = false }
+            ["multiplayerRealms"] = new JsonObject { ["enabled"] = false }
         },
         ["profanityFilterPreferences"] = new JsonObject { ["profanityFilterOn"] = false },
         ["banStatus"] = new JsonObject { ["bannedScopes"] = new JsonObject() }
@@ -922,8 +921,7 @@ internal sealed class MinecraftSessionBridge : IDisposable
                 }),
                 ["session"] = session,
                 ["player"] = player,
-                ["profiles"] = profiles,
-                ["telemetry"] = CreateEndpoints(new Dictionary<string, string>())
+                ["profiles"] = profiles
             }
         };
     }

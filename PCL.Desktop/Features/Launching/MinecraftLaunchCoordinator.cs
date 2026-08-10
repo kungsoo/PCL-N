@@ -15,7 +15,6 @@ using PCL.Application.Settings;
 using PCL.Desktop.Features.Launching.Views;
 using PCL.Desktop.Features.Shared;
 using PCL.Desktop.Localization;
-using PCL.Desktop.Telemetry;
 using PCL.Domain.Minecraft.Java;
 using PCL.Domain.Minecraft.Launch;
 using PCL.Core.Logging;

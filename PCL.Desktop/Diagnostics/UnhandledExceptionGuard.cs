@@ -14,7 +14,6 @@ using Avalonia.Threading;
 using PCL.Core.Logging;
 using PCL.Desktop.Paths;
 using PCL.Desktop.Views;
-using PCL.Desktop.Telemetry;
 
 namespace PCL.Desktop.Diagnostics;
 

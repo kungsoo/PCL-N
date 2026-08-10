@@ -94,7 +94,7 @@ public partial class PageSetupAbout : MyPageRight, ISettingsPageInteractionSourc
         MessageRequested?.Invoke(
             this,
             new SettingsMessageRequestedEventArgs(
-                Text("Setup.About.Telemetry.Terms", "用户服务协议"),
+                Text("Setup.About.Legal.Terms", "用户服务协议"),
                 EmbeddedLegalDocuments.LoadTermsMarkdown(),
                 Text("Common.Action.Close", "关闭")));
 
@@ -102,7 +102,7 @@ public partial class PageSetupAbout : MyPageRight, ISettingsPageInteractionSourc
         MessageRequested?.Invoke(
             this,
             new SettingsMessageRequestedEventArgs(
-                Text("Setup.About.Telemetry.Privacy", "隐私保护协议"),
+                Text("Setup.About.Legal.Privacy", "隐私保护协议"),
                 EmbeddedLegalDocuments.LoadPrivacyMarkdown(),
                 Text("Common.Action.Close", "关闭")));
 

@@ -18,7 +18,6 @@ using PCL.Desktop.Theme;
 using PCL.Platform.Paths;
 using PCL.Core.Logging;
 using PCL.Core.Platform;
-using PCL.Desktop.Telemetry;
 
 namespace PCL.Desktop.Features.Settings.Views;
 
