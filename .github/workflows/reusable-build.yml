@@ -253,7 +253,6 @@ jobs:
 
       - name: Publish Avalonia desktop
         shell: bash
-        env:
         run: |
           set -eo pipefail
 
