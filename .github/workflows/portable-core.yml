@@ -32,9 +32,8 @@ jobs:
         # Keep solution build coverage, but run test projects one by one:
         # VSTest solution orchestration can leave Avalonia.Headless test hosts hanging.
         env:
-          # Suppress first-run EULA / special-build dialogs in headless UI tests.
+          # Suppress first-run EULA dialogs in headless UI tests.
           PCL_DISABLE_FIRST_RUN: "1"
-          PCL_DISABLE_DEBUG_HINT: "1"
           PCL_DISABLE_DESKTOP_SHELL: "1"
         run: |
           dotnet test PCL.Application.Test/PCL.Application.Test.csproj -c Release --no-build --no-restore -warnaserror

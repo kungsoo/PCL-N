@@ -94,7 +94,6 @@ EN_KEY_OVERRIDES: dict[str, str] = {
     "Setup.Update.OtherOptions.Title": "Other options",
     "Setup.Update.OtherOptions.Placeholder": "Additional update options may appear here when available.",
     "Setup.Update.Error.NetworkFailed": "Couldn’t get the latest version information. Check your network connection and try again.",
-    "Main.SpecialVersion.CiHint": "This is a CI build of PCL N.\nIt may include unfinished changes.",
     "Launch.Right.CommunityHint.Message": "You’re using PCL N Edition.\n\nIt’s maintained separately from official PCL, and some behavior may differ.",
     "Setup.Ui.Background.Blur.ToolTip": "Strong blur can lower launcher frame rates.",
     "Setup.Ui.Background.OpenFolder.ToolTip": "Place background images or videos in this folder. One will be chosen at random when the launcher opens.\nH.264 video usually plays more smoothly.",
