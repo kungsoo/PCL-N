@@ -175,7 +175,16 @@ internal static class PclEmbeddedNativeRuntime
             // one-file release works on Unix.
             RegisterResolver(typeof(SkiaSharp.SKImageInfo).Assembly);
             RegisterResolver(typeof(HarfBuzzSharp.Blob).Assembly);
-            RegisterResolver(typeof(Avalonia.Native.AvaloniaNativePlatform).Assembly);
+
+            try
+            {
+                RegisterResolver(Assembly.Load("Avalonia.Native"));
+            }
+            catch (Exception)
+            {
+                // The package may not be present in local dev builds; fall back to the
+                // standard runtime probing path in that case.
+            }
 
             _installedDirectory = fullInstallDirectory;
         }
