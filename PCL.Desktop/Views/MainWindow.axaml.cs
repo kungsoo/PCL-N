@@ -1541,7 +1541,7 @@ public partial class MainWindow : Window, IDisposable
         }
 
         StartShowAnimation();
-        // First-run chain: community welcome → special build notice (no EULA gate).
+        // First-run chain: community welcome (no EULA gate).
         Dispatcher.UIThread.Post(MaybeShowFirstRunDialogs, DispatcherPriority.Background);
         DesktopFileLog.Info("Window", "主窗口首帧任务已排队；显现动画与后台更新检查均已启动。");
     }
@@ -1558,14 +1558,12 @@ public partial class MainWindow : Window, IDisposable
             // Legal acceptance (PCL-N-Edition terms + privacy) must pass before other first-run notices.
             MaybeShowLegalAcceptance(
                 settings,
-                () => MaybeShowCommunityWelcome(
-                    settings,
-                    () => MaybeShowSpecialVersionNotice(OnStartupNoticesCompleted)));
+                () => MaybeShowCommunityWelcome(settings, OnStartupNoticesCompleted));
         }
         catch (Exception ex)
         {
-            DesktopFileLog.Warn("FirstRun", "首次运行引导加载失败，将继续显示特殊版本提示。", ex);
-            MaybeShowSpecialVersionNotice(OnStartupNoticesCompleted);
+            DesktopFileLog.Warn("FirstRun", "首次运行引导加载失败，将继续进入启动流程。", ex);
+            OnStartupNoticesCompleted();
         }
     }
 
@@ -1631,12 +1629,11 @@ public partial class MainWindow : Window, IDisposable
     }
 
     /// <summary>
-    /// Skip community / special-build modal chains under automated hosts.
-    /// <c>PCL_DISABLE_FIRST_RUN</c> or <c>PCL_DISABLE_DEBUG_HINT</c> (any non-empty value).
+    /// Skip community modal chains under automated hosts.
+    /// <c>PCL_DISABLE_FIRST_RUN</c> (any non-empty value).
     /// </summary>
     private static bool ShouldSuppressStartupDialogs() =>
-        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_FIRST_RUN")) ||
-        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_DEBUG_HINT"));
+        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_FIRST_RUN"));
 
     private void MaybeShowCommunityWelcome(LauncherSettings settings, Action completed)
     {
@@ -1670,77 +1667,6 @@ public partial class MainWindow : Window, IDisposable
                 completed();
             },
             confirm);
-    }
-
-    private void MaybeShowSpecialVersionNotice(Action completed)
-    {
-        // WPF FormMain special build notice (Debug / CI).
-        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_DEBUG_HINT")))
-        {
-            completed();
-            return;
-        }
-
-        bool isDebug =
-#if DEBUG
-            true;
-#else
-            false;
-#endif
-        bool isCi =
-            string.Equals(Environment.GetEnvironmentVariable("CI"), "true", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"), "true", StringComparison.OrdinalIgnoreCase) ||
-            PclBuildInfo.InformationalVersion.Contains("ci", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(GetAssemblyConfiguration(), "CI", StringComparison.OrdinalIgnoreCase);
-
-        if (!isDebug && !isCi)
-        {
-            completed();
-            return;
-        }
-
-        string title = AvaloniaLocalizationManager.GetText("Main.SpecialVersion.Title", "特殊版本提示");
-        string body = isDebug
-            ? AvaloniaLocalizationManager.GetText(
-                "Main.SpecialVersion.DebugHint",
-                "当前 PCL N Edition 为 Debug 构建。\n该构建仅用于开发调试。")
-            : AvaloniaLocalizationManager.GetText(
-                "Main.SpecialVersion.CiHint",
-                "当前 PCL N Edition 为自动化 CI 构建。\n稳定性较低，不适合日常使用。");
-        string hideNotice = AvaloniaLocalizationManager.GetText(
-            "Main.SpecialVersion.HideHintNotice",
-            "可设置环境变量 PCL_DISABLE_DEBUG_HINT 为任意值以隐藏此提示。");
-
-        ShowConfirmDialog(
-            title,
-            body + "\n\n" + hideNotice,
-            confirmed =>
-            {
-                if (confirmed)
-                {
-                    completed();
-                    return;
-                }
-
-                // Secondary: open download page and exit.
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "https://github.com/MuXue1230-owo/PCL-N/releases/latest",
-                        UseShellExecute = true
-                    });
-                }
-                catch
-                {
-                    // ignore
-                }
-
-                Close();
-            },
-            AvaloniaLocalizationManager.GetText("Main.SpecialVersion.IUnderstand", "我知道我在做什么"),
-            AvaloniaLocalizationManager.GetText("Main.SpecialVersion.OpenDownloadPageAndExit", "打开最新下载页并退出"),
-            isWarn: true);
     }
 
     private async Task MaybeShowLauncherAnnouncementsAsync()

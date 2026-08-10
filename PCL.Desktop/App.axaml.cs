@@ -57,8 +57,8 @@ public sealed partial class App : Avalonia.Application
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Headless tests host their own windows. First-run/debug notice switches must not
-                // suppress the actual launcher window: PCL_DISABLE_DEBUG_HINT is documented to users.
+                // Headless tests host their own windows. Only the dedicated desktop-shell test switch
+                // should suppress the real launcher window during automation.
                 bool skipShell = ShouldSkipDesktopShell(Environment.GetEnvironmentVariable);
 
                 if (!skipShell)

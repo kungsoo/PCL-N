@@ -306,8 +306,7 @@ internal sealed class LauncherUpdateCoordinator : IDisposable
     {
         try
         {
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_FIRST_RUN")) ||
-                !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_DEBUG_HINT")))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("PCL_DISABLE_FIRST_RUN")))
             {
                 PortableLog.Debug("Update", "自动化环境已跳过启动时更新检查。");
                 return PublishAutomaticCheckResult(null);

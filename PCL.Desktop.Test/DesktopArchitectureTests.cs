@@ -22,9 +22,24 @@ public sealed class DesktopArchitectureTests
     public void DesktopShellSuppressionUsesDedicatedTestSwitchOnly()
     {
         Assert.IsFalse(App.ShouldSkipDesktopShell(key =>
-            key is "PCL_DISABLE_FIRST_RUN" or "PCL_DISABLE_DEBUG_HINT" ? "1" : null));
+            key == "PCL_DISABLE_FIRST_RUN" ? "1" : null));
         Assert.IsTrue(App.ShouldSkipDesktopShell(key =>
             key == "PCL_DISABLE_DESKTOP_SHELL" ? "1" : null));
+    }
+
+    [TestMethod]
+    public void DesktopStartupNoLongerContainsSpecialVersionHintPath()
+    {
+        string desktopRoot = FindDesktopProjectRoot();
+        string mainWindow = File.ReadAllText(Path.Combine(desktopRoot, "Views", "MainWindow.axaml.cs"));
+        string appStartup = File.ReadAllText(Path.Combine(desktopRoot, "App.axaml.cs"));
+        string updateCoordinator = File.ReadAllText(Path.Combine(desktopRoot, "Hosting", "LauncherUpdateCoordinator.cs"));
+        string englishLocalization = File.ReadAllText(Path.Combine(desktopRoot, "Localization", "en-US.xaml"));
+
+        Assert.IsFalse(mainWindow.Contains("MaybeShowSpecialVersionNotice", StringComparison.Ordinal));
+        Assert.IsFalse(appStartup.Contains("PCL_DISABLE_DEBUG_HINT", StringComparison.Ordinal));
+        Assert.IsFalse(updateCoordinator.Contains("PCL_DISABLE_DEBUG_HINT", StringComparison.Ordinal));
+        Assert.IsFalse(englishLocalization.Contains("Main.SpecialVersion.", StringComparison.Ordinal));
     }
 
     [TestMethod]
