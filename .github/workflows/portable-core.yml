@@ -45,8 +45,52 @@ jobs:
           # launch coordinator, dual-layer skins). Keep architecture tests; re-enable full
           # AvaloniaHeadlessTests once Show is unblocked.
           dotnet test PCL.Desktop.Test/PCL.Desktop.Test.csproj -c Release --no-build --no-restore -warnaserror --filter "FullyQualifiedName~DesktopArchitectureTests"
-      - name: Cross-compile Avalonia desktop shell and reject platform warnings
-        run: dotnet build PCL.Desktop/PCL.Desktop.csproj -c Release --no-restore -p:RuntimeIdentifier=win-x64 -p:PublishAot=false -warnaserror:CA1416
+      - name: Select desktop runtime
+        id: runtime
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Windows)
+              echo "rid=win-x64" >> "$GITHUB_OUTPUT"
+              ;;
+            Linux)
+              echo "rid=linux-x64" >> "$GITHUB_OUTPUT"
+              ;;
+            macOS)
+              if [[ "$(uname -m)" == "arm64" ]]; then
+                echo "rid=osx-arm64" >> "$GITHUB_OUTPUT"
+              else
+                echo "rid=osx-x64" >> "$GITHUB_OUTPUT"
+              fi
+              ;;
+            *)
+              echo "::error::Unsupported runner OS: $RUNNER_OS"
+              exit 1
+              ;;
+          esac
+
+      - name: Publish Avalonia desktop host with NativeAOT and reject platform warnings
+        run: >
+          dotnet publish PCL.Desktop/PCL.Desktop.csproj
+          -c Release
+          -r ${{ steps.runtime.outputs.rid }}
+          --self-contained true
+          -m:1
+          -nodeReuse:false
+          -p:PublishAot=true
+          -p:PublishTrimmed=true
+          -p:PublishSingleFile=false
+          -p:DebugType=None
+          -p:DebugSymbols=false
+          -warnaserror:CA1416
+          -o desktop-aot-check
+
+      - name: Upload desktop NativeAOT artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portable-desktop-${{ matrix.os }}-${{ steps.runtime.outputs.rid }}
+          path: desktop-aot-check
+          if-no-files-found: error
 
   native-aot:
     runs-on: ubuntu-latest
@@ -124,6 +168,13 @@ jobs:
           # Same-arch smoke only (matrix runners match RID for these three).
           "$binary" --validate-environment
           "$binary" --validate-assets
+
+      - name: Upload desktop NativeAOT smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-native-aot-${{ matrix.rid }}
+          path: desktop-aot-out
+          if-no-files-found: error
   desktop-portable-publish:
     strategy:
       fail-fast: false

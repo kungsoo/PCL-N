@@ -1,7 +1,7 @@
 name: Package and publish launcher assets
 
 permissions:
-  contents: write
+  contents: read
 
 on:
   workflow_call:
@@ -134,7 +134,7 @@ jobs:
 
   publish-assets:
     permissions:
-      contents: write
+      contents: read
     needs: [package-assets]
     runs-on: ubuntu-latest
     steps:
@@ -195,41 +195,9 @@ jobs:
 
           find dist -maxdepth 1 -type f -printf '%f\n' | sort
 
-      - name: Upload all assets to the existing release
-        uses: softprops/action-gh-release@v2.5.0
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ inputs.tag_name }}
-          files: dist/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish static website download catalog
-        shell: bash
-        env:
-          RELEASE_TAG: ${{ inputs.tag_name }}
-        run: |
-          set -euo pipefail
-          catalog_dir="$RUNNER_TEMP/pcln-download-catalog"
-          rm -rf "$catalog_dir"
-          if git fetch origin download-catalog:refs/remotes/origin/download-catalog; then
-            git worktree add --detach "$catalog_dir" refs/remotes/origin/download-catalog
-          else
-            git worktree add --detach "$catalog_dir" HEAD
-            git -C "$catalog_dir" switch --orphan download-catalog
-            git -C "$catalog_dir" rm -rf . || true
-          fi
-
-          python scripts/update_download_catalog.py \
-            --file "$catalog_dir/downloads.json" \
-            --tag "$RELEASE_TAG" \
-            --channel '${{ inputs.channel }}' \
-            --published-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git -C "$catalog_dir" config user.name github-actions[bot]
-          git -C "$catalog_dir" config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git -C "$catalog_dir" add downloads.json
-          if git -C "$catalog_dir" diff --cached --quiet; then
-            echo "Download catalog is already current."
-          else
-            git -C "$catalog_dir" commit -m "chore(downloads): publish $RELEASE_TAG"
-            git -C "$catalog_dir" push origin HEAD:download-catalog
-          fi
+          name: PCL_N_Signed_${{ inputs.configuration }}
+          path: dist/*
+          if-no-files-found: error
