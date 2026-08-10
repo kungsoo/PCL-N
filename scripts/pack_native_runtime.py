@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
+import sys
 import zipfile
 
 
@@ -44,7 +46,12 @@ def main() -> int:
     # Fail the release build here instead of producing a one-file artifact that
     # only crashes when a user starts it on the target platform.
     packed_names = {path.name.casefold() for _, path in files}
-    required_stems = ("libskiasharp", "libharfbuzzsharp")
+    required_stems = ["libskiasharp", "libharfbuzzsharp"]
+    if os.name == "nt":
+        pass
+    elif sys.platform == "darwin":
+        required_stems.append("libavalonianative")
+
     missing = [
         stem
         for stem in required_stems
