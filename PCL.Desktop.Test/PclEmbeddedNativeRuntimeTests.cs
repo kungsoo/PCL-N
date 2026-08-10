@@ -117,6 +117,31 @@ public sealed class PclEmbeddedNativeRuntimeTests
             PclEmbeddedNativeRuntime.GetNativeLibraryAliases("/runtime/libHarfBuzzSharp.so.0"));
     }
 
+    [TestMethod]
+    public void EnumerateNativeLibraries_IncludesNestedRuntimeAssets()
+    {
+        string dataDirectory = CreateTemporaryDirectory();
+        try
+        {
+            byte[] payload = CreatePayload(
+                ("runtimes/osx/native/libAvaloniaNative.dylib", "avalonia"),
+                ("libSkiaSharp.dylib", "skia"));
+
+            string installDirectory = PclEmbeddedNativeRuntime.EnsurePayloadInstalled(
+                payload,
+                dataDirectory,
+                "osx-arm64");
+
+            CollectionAssert.Contains(
+                PclEmbeddedNativeRuntime.EnumerateNativeLibraries(installDirectory).ToArray(),
+                Path.Combine(installDirectory, "runtimes", "osx", "native", "libAvaloniaNative.dylib"));
+        }
+        finally
+        {
+            Directory.Delete(dataDirectory, recursive: true);
+        }
+    }
+
     private static byte[] CreatePayload(params (string Path, string Content)[] files)
     {
         using MemoryStream stream = new();

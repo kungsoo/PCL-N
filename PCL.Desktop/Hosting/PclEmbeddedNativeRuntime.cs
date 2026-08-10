@@ -150,7 +150,7 @@ internal static class PclEmbeddedNativeRuntime
                 .ToArray();
             ConfigureNativeSearchDirectories(searchDirectories);
 
-            foreach (string library in EnumerateTopLevelNativeLibraries(fullInstallDirectory))
+            foreach (string library in EnumerateNativeLibraries(fullInstallDirectory))
             {
                 try
                 {
@@ -169,11 +169,13 @@ internal static class PclEmbeddedNativeRuntime
 
             // NativeAOT resolves P/Invoke names relative to the executable's directory.
             // Preloading an absolute Unix .so is not enough: a later import of
-            // "libSkiaSharp" may still issue a fresh lookup beside the executable.
-            // Return the already loaded handle explicitly for the assemblies that own
-            // Avalonia's native imports so an extracted one-file release works on Unix.
+            // "libSkiaSharp" or "libAvaloniaNative" may still issue a fresh lookup
+            // beside the executable. Return the already loaded handle explicitly for
+            // the assemblies that own Avalonia's native imports so an extracted
+            // one-file release works on Unix.
             RegisterResolver(typeof(SkiaSharp.SKImageInfo).Assembly);
             RegisterResolver(typeof(HarfBuzzSharp.Blob).Assembly);
+            RegisterResolver(typeof(Avalonia.Native.AvaloniaNativePlatform).Assembly);
 
             _installedDirectory = fullInstallDirectory;
         }
@@ -242,26 +244,33 @@ internal static class PclEmbeddedNativeRuntime
 
     private static IEnumerable<string> EnumerateNativeSearchDirectories(string installDirectory)
     {
+        HashSet<string> directories = new(PathComparer)
+        {
+            installDirectory
+        };
+
         yield return installDirectory;
 
-        foreach (string fileName in GetLibVlcLibraryNames())
+        foreach (string file in EnumerateNativeLibraries(installDirectory))
         {
-            foreach (string file in Directory.EnumerateFiles(
-                         installDirectory,
-                         fileName,
-                         SearchOption.AllDirectories))
-            {
-                string? directory = Path.GetDirectoryName(file);
-                if (!string.IsNullOrWhiteSpace(directory))
-                    yield return directory;
-            }
+            string? directory = Path.GetDirectoryName(file);
+            if (!string.IsNullOrWhiteSpace(directory) && directories.Add(directory))
+                yield return directory;
         }
+    }
+
+    internal static IEnumerable<string> EnumerateNativeLibraries(string installDirectory)
+    {
+        return Directory.EnumerateFiles(installDirectory, "*", SearchOption.AllDirectories)
+            .Where(IsNativeLibraryForCurrentPlatform)
+            .OrderBy(GetNativeLibraryLoadPriority)
+            .ThenBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase);
     }
 
     private static IEnumerable<string> EnumerateTopLevelNativeLibraries(string installDirectory)
     {
-        return Directory.EnumerateFiles(installDirectory, "*", SearchOption.TopDirectoryOnly)
-            .Where(IsNativeLibraryForCurrentPlatform)
+        return EnumerateNativeLibraries(installDirectory)
+            .Where(path => Path.GetDirectoryName(path)?.Equals(installDirectory, PathComparison) == true)
             .OrderBy(GetNativeLibraryLoadPriority)
             .ThenBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase);
     }
