@@ -256,7 +256,8 @@ public sealed partial class FirstRunWizardWindow : Window
         {
             detail.Text = AvaloniaLocalizationManager.GetText(
                 "Oobe.Welcome.ResumeDetail",
-                "插件已连接到你的配置目录。接下来将进入完成配置。);
+                "插件已连接到你的配置目录。接下来将进入完成配置。"
+            );
         }
 
         if (_btnStart is not null)
