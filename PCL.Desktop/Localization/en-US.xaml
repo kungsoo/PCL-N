@@ -478,7 +478,6 @@
     <sys:String x:Key="Main.Extra.GiveUp.ToolTip">Dismiss</sys:String>
     <sys:String x:Key="Main.Extra.ShutdownMinecraft.ToolTip">Stop Minecraft</sys:String>
     <sys:String x:Key="Main.Extra.TaskManager.ToolTip">Task manager</sys:String>
-    <sys:String x:Key="Main.Extra.UpdateRestart.ToolTip">Restart PCL N to finish updating</sys:String>
     <sys:String x:Key="Main.SpecialVersion.CiHint">This is an automated CI build of PCL N Edition. It may contain unfinished changes and is not recommended for everyday use or modpack creation.&#x0a;&#x0a;Use the latest stable release unless a contributor specifically asks you to test this build.</sys:String>
     <sys:String x:Key="Main.SpecialVersion.DebugHint">This Debug build is intended only for development and may have severe performance or network issues. Community support is not provided for problems caused by using it as a regular build.&#x0a;&#x0a;If you aren’t developing PCL N, install the latest stable release instead.</sys:String>
     <sys:String x:Key="Main.SpecialVersion.HideHintNotice">Set the PCL_DISABLE_DEBUG_HINT environment variable to any value to hide this notice.</sys:String>
@@ -764,7 +763,6 @@
     <sys:String x:Key="Setup.Left.Category.Game">Game</sys:String>
     <sys:String x:Key="Setup.Left.Category.Launcher">Launcher</sys:String>
     <sys:String x:Key="Setup.Left.Item.About">About</sys:String>
-    <sys:String x:Key="Setup.Left.Item.Feedback">Feedback</sys:String>
     <sys:String x:Key="Setup.Left.Item.GameManage">Game data</sys:String>
     <sys:String x:Key="Setup.Left.Item.Java">Java</sys:String>
     <sys:String x:Key="Setup.Left.Item.Launch">Launch options</sys:String>
@@ -772,7 +770,6 @@
     <sys:String x:Key="Setup.Left.Item.Misc">General</sys:String>
     <sys:String x:Key="Setup.Left.Item.Experimental">Experimental</sys:String>
     <sys:String x:Key="Setup.Left.Item.Ui">Appearance</sys:String>
-    <sys:String x:Key="Setup.Left.Item.Update">Software update</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.AnimationSpeed">Animation speed</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.Delay">Add random delays</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.Delay.ToolTip">Adds delays throughout the launcher to test loading behavior.&#x0a;This significantly reduces performance and should be enabled only for testing.</sys:String>

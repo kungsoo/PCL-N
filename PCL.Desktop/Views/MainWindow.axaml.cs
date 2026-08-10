@@ -3220,7 +3220,7 @@ public partial class MainWindow : Window, IDisposable
             }
             catch (ObjectDisposedException)
             {
-                _taskCancellations.TryRemove(taskId, out _);
+                _taskCancellations.Remove(taskId, out _);
             }
         }
     }
