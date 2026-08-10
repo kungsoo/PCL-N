@@ -487,7 +487,7 @@
     <sys:String x:Key="Oobe.Welcome.Title">欢迎使用 PCL N Edition</sys:String>
     <sys:String x:Key="Oobe.Welcome.UpdateTitle">PCL N Edition 已更新</sys:String>
     <sys:String x:Key="Oobe.Welcome.ResumeTitle">配置目录已就绪</sys:String>
-    <sys:String x:Key="Oobe.Welcome.ResumeDetail">插件已连接到你的配置目录。下一步将进行在线服务配置。</sys:String>
+    <sys:String x:Key="Oobe.Welcome.ResumeDetail">插件已连接到你的配置目录。接下来将进入完成配置。</sys:String>
     <sys:String x:Key="Oobe.Legal.Disagree">不同意</sys:String>
     <sys:String x:Key="Oobe.Legal.DisagreeExit">不同意并退出</sys:String>
     <sys:String x:Key="Oobe.Legal.Agree">同意条款</sys:String>
@@ -496,9 +496,9 @@
     <sys:String x:Key="Oobe.Data.Title">启动器数据配置</sys:String>
     <sys:String x:Key="Oobe.Data.BrowseData">选择启动器数据位置</sys:String>
     <sys:String x:Key="Oobe.Data.BrowseCache">选择启动器缓存位置</sys:String>
-    <sys:String x:Key="Oobe.Online.Title">在线服务配置</sys:String>
-    <sys:String x:Key="Oobe.Online.Unavailable">插件侧车未运行，暂时无法登录在线账户。可跳过本页，稍后在「设置 → 在线」中连接。</sys:String>
-    <sys:String x:Key="Oobe.Online.Unavailable.Detail">在线服务由 Plugin 提供；打包完整发行版后，此页将显示登录与云同步入口。</sys:String>
+    <sys:String x:Key="Oobe.Online.Title">本地配置</sys:String>
+    <sys:String x:Key="Oobe.Online.Unavailable">插件侧车未运行，当前无法继续在线配置。可跳过本页，稍后在设置中连接可用插件。</sys:String>
+    <sys:String x:Key="Oobe.Online.Unavailable.Detail">当前版本已移除在线服务入口，后续功能将按本地模式继续。</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Title">遥测与数据收集</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Essential.Title">基本服务数据（必须）</sys:String>
     <sys:String x:Key="Oobe.Telemetry.Essential.Intro">为提供更新、下载、安全校验与故障恢复，启动器会处理维持服务所必需的最少数据，此部分不能关闭，也不用于产品画像或广告。</sys:String>
@@ -624,7 +624,7 @@
     <sys:String x:Key="Setup.Feedback.Status.UpNext">即将处理</sys:String>
     <sys:String x:Key="Setup.Feedback.Status.Waiting">等待中</sys:String>
     <sys:String x:Key="Setup.Feedback.Status.WaitingProcess">等待处理</sys:String>
-    <sys:String x:Key="Setup.Feedback.Submit.Description">提交前请先搜索已有反馈，避免重复。&#x0a;新建 Issue 需要先登录 PCL N 在线服务账户，访问凭据仅由 PCL.Plugin 处理。</sys:String>
+    <sys:String x:Key="Setup.Feedback.Submit.Description">提交前请先搜索已有反馈，避免重复。&#x0a;新建 Issue 需要先完成本地账户或插件连接，访问凭据仅由 PCL.Plugin 处理。</sys:String>
     <sys:String x:Key="Setup.Feedback.Submit.Open">新建反馈</sys:String>
     <sys:String x:Key="Setup.Feedback.Submit.Title">提交反馈</sys:String>
     <sys:String x:Key="Setup.Feedback.Compose.Title">新建反馈</sys:String>
@@ -1082,7 +1082,7 @@
     <sys:String x:Key="Plugin.Group.Online">在线</sys:String>
     <sys:String x:Key="Plugin.Group.Main">插件</sys:String>
     <sys:String x:Key="Plugin.Account.Title">账户</sys:String>
-    <sys:String x:Key="Plugin.Account.Heading">PCL N 在线服务账户</sys:String>
+    <sys:String x:Key="Plugin.Account.Heading">PCL N 本地账户</sys:String>
     <sys:String x:Key="Plugin.Account.Description">登录 GitHub 或 Microsoft，管理身份绑定、Minecraft 档案和桌面设备会话。</sys:String>
     <sys:String x:Key="Plugin.Installed.Title">已安装</sys:String>
     <sys:String x:Key="Plugin.Market.Title">市场</sys:String>

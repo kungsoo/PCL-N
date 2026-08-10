@@ -170,7 +170,7 @@ internal sealed class FeedbackSubmissionWindow : Window
                     {
                         Text = Text(
                             "Setup.Feedback.Compose.Privacy",
-                            "在线服务仅用于确认登录状态并提交认证请求。请勿填写令牌、密码或完整账户信息。提交后会按类型自动打上仓库标签（如 Bug、崩溃、新功能、优化、等待处理）。"),
+                            "反馈提交仅用于确认本地连接状态并提交认证请求。请勿填写令牌、密码或完整账户信息。提交后会按类型自动打上仓库标签（如 Bug、崩溃、新功能、优化、等待处理）。"),
                         Opacity = 0.75d,
                         TextWrapping = TextWrapping.Wrap
                     },

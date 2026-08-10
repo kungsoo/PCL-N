@@ -54,7 +54,7 @@
 
 - 第三方插件公开契约：[PCL-N-Plugin-SDK](https://github.com/MuXue1230-owo/PCL-N-Plugin-SDK)
 - 私有插件运行时与内置 HostModule：`PCL.Plugin/`（见其 README）
-- 在线服务端：`PCL.Server/`（独立部署，见其 README）
+- 连接服务端：`PCL.Server/`（独立部署，见其 README）
 
 ## 💻 支持平台
 

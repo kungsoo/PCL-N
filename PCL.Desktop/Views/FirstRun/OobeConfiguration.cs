@@ -26,7 +26,7 @@ internal static class OobeConfiguration
     public const string SettingsKeyCompletedVersionLegacy = "UiFirstRunWizardVersion";
 
     public const string ForceArgument = "--oobe";
-    /// <summary>Resume OOBE after config-dir restart: Welcome → Online → Finish.</summary>
+    /// <summary>Resume OOBE after config-dir restart: Welcome → Finish.</summary>
     public const string ResumeArgument = "--oobe-resume";
     public const string DisableEnvironmentVariable = "PCL_DISABLE_FIRST_RUN";
     public const string SettingsKeyPendingResume = "UiOobePendingResume";
@@ -177,11 +177,10 @@ internal static class OobeConfiguration
         }
     }
 
-    /// <summary>Default post-path-restart steps: welcome, then online configuration.</summary>
+    /// <summary>Default post-path-restart steps: welcome, then finish.</summary>
     public static IReadOnlyList<OobeStepId> DefaultResumeSteps { get; } =
     [
         OobeStepId.Welcome,
-        OobeStepId.Online,
         OobeStepId.Finish
     ];
 
@@ -484,7 +483,6 @@ internal sealed class OobeManifest
         OobeStepId.Terms,
         OobeStepId.Privacy,
         OobeStepId.DataPaths,
-        OobeStepId.Online,
         OobeStepId.Finish
     ];
 
@@ -535,7 +533,7 @@ internal sealed class OobeManifestFile
 {
     public string? ContentVersion { get; set; }
 
-    /// <summary>Step names: welcome, terms, privacy, data, online, telemetry, finish.</summary>
+    /// <summary>Step names: welcome, terms, privacy, data, telemetry, finish.</summary>
     public List<string>? FullSteps { get; set; }
 
     /// <summary>Steps for users who already completed an older ContentVersion.</summary>

@@ -620,7 +620,7 @@ internal sealed class PageSetupRemoteDataChain : MyPageRight, IRefreshableSettin
             return MyButton.ColorState.Gray;
         if (actionId is "market.installRemote" or "catalog.install" or "market.installListing"
             or "developer.verify" or "online.connect"
-            || label is "获取" or "安装" or "更新" or "验证订单并启用" or "连接 PCL N 在线服务账户")
+            || label is "获取" or "安装" or "更新" or "验证订单并启用" or "连接可用账户")
             return MyButton.ColorState.Highlight;
         return MyButton.ColorState.Normal;
     }
@@ -913,7 +913,7 @@ internal sealed class PageSetupRemoteDataChain : MyPageRight, IRefreshableSettin
             or "safety.setPluginSafe" or "safety.setUiSafe" or "safety.setIsolation"
             or "developer.setMode" or "developer.setAllowUnsigned" or "developer.showSafety"
             or "developer.showUiPatches" or "developer.showCompatibility"
-            or "developer.setDiagnostics" or "cloud.setSection";
+            or "developer.setDiagnostics";
 
     private async Task InvokeAsync(
         string actionId,

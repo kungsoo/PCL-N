@@ -177,7 +177,7 @@ public partial class PageSetupFeedback : MyPageRight, IRefreshableSettingsPage, 
             if (!authenticated)
             {
                 throw new InvalidOperationException(
-                    "新建反馈需要先登录 PCL N 在线服务账户。\n请打开「设置 → 在线 → 账户」连接后再试。");
+                    "新建反馈需要先完成本地账户或插件连接。\n请先连接可用的账户或插件侧车后再试。");
             }
 
             if (Avalonia.Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime lifetime ||

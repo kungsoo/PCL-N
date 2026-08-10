@@ -163,7 +163,7 @@
                     </Grid>
                 </Grid>
 
-                <!-- 5: Online services (plugin-injected content host) -->
+                <!-- 5: Local setup placeholder -->
                 <Grid x:Name="PageOnline" IsVisible="False" Opacity="0" IsHitTestVisible="False" Margin="28,18,28,22">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -171,7 +171,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock x:Name="LabOnlineTitle" Grid.Row="0"
-                               Text="在线服务配置"
+                               Text="本地配置"
                                FontSize="24" FontWeight="SemiBold"
                                Margin="0,0,0,8"
                                Foreground="{DynamicResource ColorBrush1}" />

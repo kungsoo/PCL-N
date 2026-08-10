@@ -230,7 +230,7 @@ public sealed partial class FirstRunWizardWindow : Window
         if (this.FindControl<TextBlock>("LabDataTitle") is { } dataTitle)
             dataTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Data.Title", "启动器数据配置");
         if (this.FindControl<TextBlock>("LabOnlineTitle") is { } onlineTitle)
-            onlineTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Online.Title", "在线服务配置");
+            onlineTitle.Text = AvaloniaLocalizationManager.GetText("Oobe.Online.Title", "本地配置");
         if (this.FindControl<TextBlock>("LabFinishTitle") is { } finish)
             finish.Text = AvaloniaLocalizationManager.GetText("Oobe.Finish.Title", "感谢您选择 PCL N Edition！");
         if (_btnFinish is not null)
@@ -256,7 +256,7 @@ public sealed partial class FirstRunWizardWindow : Window
         {
             detail.Text = AvaloniaLocalizationManager.GetText(
                 "Oobe.Welcome.ResumeDetail",
-                "插件已连接到你的配置目录。下一步将进行在线服务配置。");
+                "插件已连接到你的配置目录。接下来将进入完成配置。);
         }
 
         if (_btnStart is not null)
@@ -813,7 +813,7 @@ public sealed partial class FirstRunWizardWindow : Window
                 {
                     Text = AvaloniaLocalizationManager.GetText(
                         "Oobe.Online.Unavailable.Detail",
-                        "在线服务由 Plugin 提供；打包完整发行版后，此页将显示登录与云同步入口。"),
+                        "当前版本已移除在线服务入口，后续功能将按本地模式继续。"),
                     Opacity = 0.7,
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = new SolidColorBrush(Color.Parse("#FF1C1C1E"))
