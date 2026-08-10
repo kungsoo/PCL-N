@@ -2,6 +2,7 @@
 // Modifications Copyright (c) 2026 PCL N contributors.
 // Licensed under the Apache License, Version 2.0.
 
+using System.Globalization;
 using PCL.Application.Downloads;
 using PCL.Application.Settings;
 using PCL.Desktop.Diagnostics;
